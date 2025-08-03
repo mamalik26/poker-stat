@@ -250,6 +250,111 @@ class PokerEngine:
             category="made_hand" if hand_class <= 7 else "high_card"
         )
     
+    def _analyze_incomplete_hand(self, hole_cards: List[int], community_cards: List[int]) -> HandStrength:
+        """
+        Analyze hand strength with incomplete board (flop/turn scenarios)
+        """
+        # Convert cards to readable format for analysis
+        hole_readable = [TreysCard.int_to_pretty_str(card) for card in hole_cards]
+        community_readable = [TreysCard.int_to_pretty_str(card) for card in community_cards]
+        
+        # Analyze what we have and potential draws
+        all_cards = hole_cards + community_cards
+        
+        # Check for pairs, trips, etc. in current cards
+        ranks = [self._get_card_rank_value(card) for card in all_cards]
+        suits = [self._get_card_suit(card) for card in all_cards]
+        
+        rank_counts = {}
+        suit_counts = {}
+        
+        for rank in ranks:
+            rank_counts[rank] = rank_counts.get(rank, 0) + 1
+        for suit in suits:
+            suit_counts[suit] = suit_counts.get(suit, 0) + 1
+        
+        # Check for made hands
+        pairs = [rank for rank, count in rank_counts.items() if count == 2]
+        trips = [rank for rank, count in rank_counts.items() if count == 3]
+        quads = [rank for rank, count in rank_counts.items() if count == 4]
+        
+        # Check for flush potential
+        max_suit_count = max(suit_counts.values()) if suit_counts else 0
+        flush_draw = max_suit_count == 4
+        flush_made = max_suit_count >= 5
+        
+        # Check for straight potential
+        unique_ranks = sorted(set(ranks), reverse=True)
+        straight_made, straight_draw = self._check_straight_potential(unique_ranks)
+        
+        # Determine hand strength
+        if quads:
+            return HandStrength("Four of a Kind", f"Quad {self._rank_to_name(quads[0])}s", 8, "made_hand")
+        elif trips:
+            if pairs:
+                return HandStrength("Full House", f"{self._rank_to_name(trips[0])}s full of {self._rank_to_name(pairs[0])}s", 7, "made_hand")
+            else:
+                return HandStrength("Three of a Kind", f"Trip {self._rank_to_name(trips[0])}s", 6, "made_hand")
+        elif flush_made:
+            return HandStrength("Flush", f"{self._get_flush_suit_name(suit_counts)} flush", 6, "made_hand")
+        elif straight_made:
+            return HandStrength("Straight", f"{self._rank_to_name(max(unique_ranks))}-high straight", 5, "made_hand")
+        elif len(pairs) >= 2:
+            return HandStrength("Two Pair", f"{self._rank_to_name(max(pairs))}s and {self._rank_to_name(min(pairs))}s", 4, "made_hand")
+        elif pairs:
+            return HandStrength("Pair", f"Pair of {self._rank_to_name(pairs[0])}s", 3, "made_hand")
+        elif flush_draw and straight_draw:
+            return HandStrength("Straight Flush Draw", "Open-ended straight flush draw", 6, "drawing_hand")
+        elif straight_draw:
+            return HandStrength("Straight Draw", "Open-ended straight draw", 4, "drawing_hand")
+        elif flush_draw:
+            return HandStrength("Flush Draw", f"4-card flush draw", 4, "drawing_hand")
+        else:
+            high_card = max(ranks)
+            return HandStrength("High Card", f"{self._rank_to_name(high_card)} high", 2, "high_card")
+    
+    def _get_card_rank_value(self, card_int: int) -> int:
+        """Extract rank value from treys card integer"""
+        return (card_int >> 8) & 0xF
+    
+    def _get_card_suit(self, card_int: int) -> int:
+        """Extract suit from treys card integer"""
+        return card_int & 0xF
+    
+    def _rank_to_name(self, rank_value: int) -> str:
+        """Convert rank value to readable name"""
+        rank_names = {14: "Ace", 13: "King", 12: "Queen", 11: "Jack", 10: "Ten",
+                      9: "Nine", 8: "Eight", 7: "Seven", 6: "Six", 5: "Five",
+                      4: "Four", 3: "Three", 2: "Two"}
+        return rank_names.get(rank_value, str(rank_value))
+    
+    def _get_flush_suit_name(self, suit_counts: dict) -> str:
+        """Get the name of the flush suit"""
+        max_suit = max(suit_counts.items(), key=lambda x: x[1])[0]
+        suit_names = {1: "Spades", 2: "Hearts", 4: "Diamonds", 8: "Clubs"}
+        return suit_names.get(max_suit, "Unknown")
+    
+    def _check_straight_potential(self, sorted_ranks: List[int]) -> tuple:
+        """Check for made straights and straight draws"""
+        if len(sorted_ranks) < 3:
+            return False, False
+            
+        # Check for made straight (5 consecutive)
+        for i in range(len(sorted_ranks) - 4):
+            if sorted_ranks[i] - sorted_ranks[i+4] == 4:
+                return True, False
+        
+        # Check for straight draw (4 consecutive or gaps)
+        for i in range(len(sorted_ranks) - 3):
+            if sorted_ranks[i] - sorted_ranks[i+3] <= 4:
+                return False, True
+                
+        # Special case: A-2-3-4 low straight
+        if 14 in sorted_ranks and 2 in sorted_ranks and 3 in sorted_ranks and 4 in sorted_ranks:
+            return False, True
+            
+        return False, False
+
     def _analyze_preflop_hand(self, hole_cards: List[int]) -> HandStrength:
         """
         Analyze pre-flop hand strength
