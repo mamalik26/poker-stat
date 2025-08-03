@@ -38,12 +38,44 @@ async def analyze_hand(request: AnalysisRequest):
     for later streets (turn, river) when possible.
     """
     try:
+        # Validate card formats before conversion
+        def validate_card_format(card):
+            if not card:
+                return True  # None is allowed
+            if not hasattr(card, 'rank') or not hasattr(card, 'suit'):
+                return False
+            valid_ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A']
+            valid_suits = ['hearts', 'diamonds', 'clubs', 'spades']
+            return card.rank in valid_ranks and card.suit in valid_suits
+        
+        # Check hole cards format
+        for i, card in enumerate(request.hole_cards):
+            if not validate_card_format(card):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid hole card format at position {i+1}: {card}"
+                )
+        
+        # Check community cards format
+        for i, card in enumerate(request.community_cards):
+            if not validate_card_format(card):
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid community card format at position {i+1}: {card}"
+                )
+        
         # Convert request cards to engine format
-        hole_cards = [Card(rank=card.rank, suit=card.suit) for card in request.hole_cards if card]
-        community_cards = [
-            Card(rank=card.rank, suit=card.suit) if card else None 
-            for card in request.community_cards
-        ]
+        try:
+            hole_cards = [Card(rank=card.rank, suit=card.suit) for card in request.hole_cards if card]
+            community_cards = [
+                Card(rank=card.rank, suit=card.suit) if card else None 
+                for card in request.community_cards
+            ]
+        except Exception as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Error converting card format: {str(e)}"
+            )
         
         # Validate hole cards
         if len(hole_cards) != 2:
