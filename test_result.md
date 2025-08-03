@@ -209,7 +209,7 @@ backend:
 
   - task: "POST /api/analyze-hand - Invalid card format validation"
     implemented: true
-    working: false
+    working: true
     file: "/app/backend/poker_engine.py"
     stuck_count: 1
     priority: "medium"
@@ -218,6 +218,9 @@ backend:
         - working: false
         - agent: "testing"
         - comment: "❌ BUG - Invalid card ranks (like 'X') cause 500 Internal Server Error instead of proper 400 validation error. Treys library throws exception 'X' when trying to convert invalid rank. Should be caught and converted to 400 error."
+        - working: true
+        - agent: "testing"
+        - comment: "✅ FIXED - Invalid card format validation now working correctly! Both invalid rank 'Z' and invalid suit 'invalid' properly return 400 Bad Request errors instead of 500 Internal Server Error. The validation logic has been improved."
 
   - task: "POST /api/analyze-hand - Missing hole cards validation"
     implemented: true
