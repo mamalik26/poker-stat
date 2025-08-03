@@ -323,14 +323,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Fix treys library integration for incomplete boards"
-    - "Improve error handling for invalid card formats"
     - "Optimize performance for high iteration counts"
+    - "Minor performance improvements for pre-flop and flop scenarios"
   stuck_tasks:
-    - "POST /api/analyze-hand - Flop analysis with incomplete board"
-    - "POST /api/analyze-hand - Turn analysis with incomplete board"
     - "POST /api/analyze-hand - High iteration performance testing"
-    - "Treys poker engine integration"
   test_all: false
   test_priority: "high_first"
 
