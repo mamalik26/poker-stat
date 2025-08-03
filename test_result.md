@@ -101,3 +101,224 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: Test the poker probability calculator backend API thoroughly with specific focus on API endpoints, valid Texas Hold'em scenarios, edge cases, performance testing, and response validation.
+
+backend:
+  - task: "GET /api/ - Basic health check endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ PASS - Returns correct message and version fields. Response: {'message': 'Poker Probability Calculator API', 'version': '1.0.0'}"
+
+  - task: "GET /api/health - Health status check endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ PASS - Returns all required health fields (status, engine, database). Response: {'status': 'healthy', 'engine': 'operational', 'database': 'connected'}"
+
+  - task: "GET /api/hand-rankings - Hand rankings reference endpoint"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ PASS - Returns all 10 poker hand rankings with required fields (rank, name, description)"
+
+  - task: "POST /api/analyze-hand - Pre-flop analysis"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "Minor: Performance issue - Pre-flop AK analysis takes 2.85s (exceeds 2s target). Functionality works correctly with proper probability calculations."
+
+  - task: "POST /api/analyze-hand - Flop analysis with incomplete board"
+    implemented: true
+    working: false
+    file: "/app/backend/poker_engine.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+        - agent: "testing"
+        - comment: "❌ CRITICAL BUG - Treys library evaluator requires exactly 5 cards total for hand evaluation. Flop scenarios (3 community cards + 2 hole cards = 5 total) work for Monte Carlo simulation but fail in _evaluate_current_hand() method. Error: '3' thrown by treys evaluator.evaluate(). This affects all scenarios with <5 community cards."
+
+  - task: "POST /api/analyze-hand - Turn analysis with incomplete board"
+    implemented: true
+    working: false
+    file: "/app/backend/poker_engine.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+        - agent: "testing"
+        - comment: "❌ CRITICAL BUG - Same treys library issue as flop. Turn scenarios (4 community cards + 2 hole cards = 6 total) should work but _evaluate_current_hand() method fails when trying to evaluate with incomplete 5-card board."
+
+  - task: "POST /api/analyze-hand - River analysis with complete board"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ PASS - River scenarios work correctly when all 5 community cards are present. Three aces scenario returned 82.86% win probability which is reasonable."
+
+  - task: "POST /api/analyze-hand - Duplicate cards validation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ PASS - Correctly returns 400 error for duplicate cards with proper error message"
+
+  - task: "POST /api/analyze-hand - Invalid card format validation"
+    implemented: true
+    working: false
+    file: "/app/backend/poker_engine.py"
+    stuck_count: 1
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: false
+        - agent: "testing"
+        - comment: "❌ BUG - Invalid card ranks (like 'X') cause 500 Internal Server Error instead of proper 400 validation error. Treys library throws exception 'X' when trying to convert invalid rank. Should be caught and converted to 400 error."
+
+  - task: "POST /api/analyze-hand - Missing hole cards validation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ PASS - Correctly returns 400 error when fewer than 2 hole cards provided"
+
+  - task: "POST /api/analyze-hand - Too many community cards validation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ PASS - Correctly returns 400 error when more than 5 community cards provided"
+
+  - task: "POST /api/analyze-hand - Invalid player count validation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ PASS - Correctly returns 422 validation error for player counts outside 2-10 range"
+
+  - task: "POST /api/analyze-hand - High iteration performance testing"
+    implemented: true
+    working: false
+    file: "/app/backend/poker_engine.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+        - agent: "testing"
+        - comment: "❌ CRITICAL BUG - Same treys library issue. High iteration count scenarios fail due to _evaluate_current_hand() method trying to evaluate incomplete boards. Returns 500 error with message 'Internal server error during analysis: 3'"
+
+  - task: "POST /api/analyze-hand - Different player counts (2-10 players)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ PASS - All player counts (2, 4, 6, 8, 10) work correctly. Opponent ranges properly match expected counts based on player count."
+
+  - task: "Monte Carlo simulation accuracy and performance"
+    implemented: true
+    working: true
+    file: "/app/backend/poker_engine.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ PASS - Monte Carlo simulations work correctly and produce realistic probabilities. Performance is acceptable for most scenarios. Probabilities sum to ~100% as expected."
+
+  - task: "Treys poker engine integration"
+    implemented: true
+    working: false
+    file: "/app/backend/poker_engine.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+        - agent: "testing"
+        - comment: "❌ CRITICAL BUG - Treys library integration has fundamental flaw in _evaluate_current_hand() method. The evaluator.evaluate() requires exactly 5 cards total but is being called with incomplete boards (3-4 community cards). This breaks flop/turn analysis completely."
+
+frontend:
+  # Frontend testing not performed as per instructions
+
+metadata:
+  created_by: "testing_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Fix treys library integration for incomplete boards"
+    - "Improve error handling for invalid card formats"
+    - "Optimize performance for high iteration counts"
+  stuck_tasks:
+    - "POST /api/analyze-hand - Flop analysis with incomplete board"
+    - "POST /api/analyze-hand - Turn analysis with incomplete board"
+    - "POST /api/analyze-hand - High iteration performance testing"
+    - "Treys poker engine integration"
+  test_all: false
+  test_priority: "high_first"
+
+agent_communication:
+    - agent: "testing"
+    - message: "Completed comprehensive backend API testing. Found critical bug in treys library integration that breaks flop/turn analysis. The _evaluate_current_hand() method calls evaluator.evaluate() with incomplete boards, but treys requires exactly 5 cards. This affects any scenario with <5 community cards. Also found minor issues with error handling for invalid card formats. Performance is acceptable but could be optimized. 9/14 tests passed overall."
