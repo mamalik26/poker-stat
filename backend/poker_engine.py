@@ -353,9 +353,41 @@ class PokerEngine:
         if 14 in sorted_ranks and 2 in sorted_ranks and 3 in sorted_ranks and 4 in sorted_ranks:
             return False, True
             
-        return False, False
-
     def _analyze_preflop_hand(self, hole_cards: List[int]) -> HandStrength:
+        """
+        Analyze pre-flop hand strength
+        """
+        if len(hole_cards) != 2:
+            return HandStrength("Unknown", "Invalid hand", 1, "unknown")
+        
+        # Convert to readable format for analysis
+        card1_str = TreysCard.int_to_pretty_str(hole_cards[0])
+        card2_str = TreysCard.int_to_pretty_str(hole_cards[1])
+        
+        rank1 = card1_str[0]
+        rank2 = card2_str[0]
+        suit1 = card1_str[1]
+        suit2 = card2_str[1]
+        
+        is_pair = rank1 == rank2
+        is_suited = suit1 == suit2
+        
+        if is_pair:
+            if rank1 in ['A', 'K', 'Q', 'J']:
+                return HandStrength("Premium Pair", f"Pair of {rank1}s", 8, "premium")
+            else:
+                return HandStrength("Pocket Pair", f"Pair of {rank1}s", 6, "strong")
+        
+        if is_suited:
+            if rank1 in ['A', 'K'] and rank2 in ['A', 'K']:
+                return HandStrength("Premium Suited", f"{rank1}{rank2} suited", 7, "premium")
+            else:
+                return HandStrength("Suited Cards", f"{rank1}{rank2} suited", 5, "playable")
+        
+        if rank1 in ['A', 'K'] and rank2 in ['A', 'K']:
+            return HandStrength("Premium Offsuit", f"{rank1}{rank2} offsuit", 6, "strong")
+        
+        return HandStrength("High Cards", f"{rank1}{rank2} offsuit", 3, "marginal")
         """
         Analyze pre-flop hand strength
         """
