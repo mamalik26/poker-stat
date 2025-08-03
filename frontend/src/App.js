@@ -1,52 +1,51 @@
-import { useEffect } from "react";
-import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import React, { useState, useCallback } from 'react';
+import './App.css';
+import PokerTable from './components/PokerTable';
+import ProbabilityDashboard from './components/ProbabilityDashboard';
+import { getMockAnalysis } from './mock';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+function App() {
+  const [analysis, setAnalysis] = useState(null);
+  const [playerCount, setPlayerCount] = useState(2);
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+  const handleCardsChange = useCallback((holeCards, communityCards) => {
+    const newAnalysis = getMockAnalysis(holeCards, communityCards);
+    setAnalysis(newAnalysis);
+  }, []);
 
-  useEffect(() => {
-    helloWorldApi();
+  const handlePlayersChange = useCallback((count) => {
+    setPlayerCount(count);
   }, []);
 
   return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-4">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Poker Table */}
+          <div className="lg:col-span-1">
+            <PokerTable 
+              onCardsChange={handleCardsChange}
+              onPlayersChange={handlePlayersChange}
+            />
+          </div>
 
-function App() {
-  return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+          {/* Analysis Dashboard */}
+          <div className="lg:col-span-1">
+            <ProbabilityDashboard 
+              analysis={analysis} 
+              playerCount={playerCount}
+            />
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-gray-600 text-sm">
+          <p>
+            <span className="font-semibold">Note:</span> This is a demo version with mock calculations. 
+            Full Monte Carlo simulations and combinatorial analysis will be implemented in the backend.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
