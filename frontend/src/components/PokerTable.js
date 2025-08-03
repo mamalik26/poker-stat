@@ -3,11 +3,11 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Trash2, RotateCcw } from 'lucide-react';
+import { Trash2, RotateCcw, Loader2 } from 'lucide-react';
 import CardSelector from './CardSelector';
 import { SUIT_SYMBOLS, SUIT_COLORS } from '../mock';
 
-const PlayingCardDisplay = ({ card, onRemove, position }) => {
+const PlayingCardDisplay = ({ card, onRemove, position, disabled }) => {
   if (!card) return null;
 
   return (
@@ -17,23 +17,26 @@ const PlayingCardDisplay = ({ card, onRemove, position }) => {
         flex flex-col items-center justify-center font-bold text-sm
         transition-all duration-200 hover:shadow-xl hover:-translate-y-1
         ${SUIT_COLORS[card.suit]}
+        ${disabled ? 'opacity-60' : ''}
       `}>
         <span className="text-lg">{card.rank}</span>
         <span className="text-xl">{SUIT_SYMBOLS[card.suit]}</span>
       </div>
-      <Button
-        variant="destructive"
-        size="sm"
-        className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-        onClick={() => onRemove(position)}
-      >
-        <Trash2 className="w-3 h-3" />
-      </Button>
+      {!disabled && (
+        <Button
+          variant="destructive"
+          size="sm"
+          className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={() => onRemove(position)}
+        >
+          <Trash2 className="w-3 h-3" />
+        </Button>
+      )}
     </div>
   );
 };
 
-const PokerTable = ({ onCardsChange, onPlayersChange }) => {
+const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
   const [holeCards, setHoleCards] = useState([null, null]);
   const [communityCards, setCommunityCards] = useState([null, null, null, null, null]);
   const [playerCount, setPlayerCount] = useState(2);
@@ -69,9 +72,11 @@ const PokerTable = ({ onCardsChange, onPlayersChange }) => {
   };
 
   const clearAll = () => {
-    setHoleCards([null, null]);
-    setCommunityCards([null, null, null, null, null]);
-    onCardsChange([null, null], [null, null, null, null, null]);
+    const emptyHole = [null, null];
+    const emptyCommunity = [null, null, null, null, null];
+    setHoleCards(emptyHole);
+    setCommunityCards(emptyCommunity);
+    onCardsChange(emptyHole, emptyCommunity);
   };
 
   const handlePlayerCountChange = (count) => {
@@ -80,7 +85,16 @@ const PokerTable = ({ onCardsChange, onPlayersChange }) => {
   };
 
   return (
-    <Card className="w-full bg-gradient-to-br from-green-800 to-green-900 border-green-700">
+    <Card className="w-full bg-gradient-to-br from-green-800 to-green-900 border-green-700 relative">
+      {isLoading && (
+        <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center z-10">
+          <div className="bg-white rounded-lg p-4 flex items-center gap-3 shadow-xl">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+            <span className="font-medium text-gray-800">Analyzing hand...</span>
+          </div>
+        </div>
+      )}
+      
       <CardHeader className="pb-4">
         <CardTitle className="text-white text-center text-2xl font-bold">
           Texas Hold'em Probability Calculator
@@ -95,9 +109,15 @@ const PokerTable = ({ onCardsChange, onPlayersChange }) => {
               value={playerCount}
               onChange={(e) => handlePlayerCountChange(parseInt(e.target.value))}
               className="w-16 bg-white"
+              disabled={isLoading}
             />
           </div>
-          <Button variant="outline" onClick={clearAll} className="bg-white">
+          <Button 
+            variant="outline" 
+            onClick={clearAll} 
+            className="bg-white"
+            disabled={isLoading}
+          >
             <RotateCcw className="w-4 h-4 mr-2" />
             Clear All
           </Button>
@@ -116,12 +136,14 @@ const PokerTable = ({ onCardsChange, onPlayersChange }) => {
                     card={card} 
                     onRemove={(pos) => removeCard('hole', pos)}
                     position={index}
+                    disabled={isLoading}
                   />
                 ) : (
                   <CardSelector
                     selectedCards={allSelectedCards}
                     onCardSelect={(card) => handleHoleCardSelect(card, index)}
                     title={`Select Hole Card ${index + 1}`}
+                    disabled={isLoading}
                   />
                 )}
               </div>
@@ -144,13 +166,14 @@ const PokerTable = ({ onCardsChange, onPlayersChange }) => {
                       card={card} 
                       onRemove={(pos) => removeCard('community', pos)}
                       position={index}
+                      disabled={isLoading}
                     />
                   ) : (
                     <CardSelector
                       selectedCards={allSelectedCards}
                       onCardSelect={(card) => handleCommunityCardSelect(card, index)}
                       title={`Select Flop Card ${index + 1}`}
-                      disabled={index > 0 && !communityCards[index - 1]}
+                      disabled={isLoading || (index > 0 && !communityCards[index - 1])}
                     />
                   )}
                 </div>
@@ -167,13 +190,14 @@ const PokerTable = ({ onCardsChange, onPlayersChange }) => {
                   card={communityCards[3]} 
                   onRemove={(pos) => removeCard('community', pos)}
                   position={3}
+                  disabled={isLoading}
                 />
               ) : (
                 <CardSelector
                   selectedCards={allSelectedCards}
                   onCardSelect={(card) => handleCommunityCardSelect(card, 3)}
                   title="Select Turn Card"
-                  disabled={!communityCards[2]}
+                  disabled={isLoading || !communityCards[2]}
                 />
               )}
             </div>
@@ -188,13 +212,14 @@ const PokerTable = ({ onCardsChange, onPlayersChange }) => {
                   card={communityCards[4]} 
                   onRemove={(pos) => removeCard('community', pos)}
                   position={4}
+                  disabled={isLoading}
                 />
               ) : (
                 <CardSelector
                   selectedCards={allSelectedCards}
                   onCardSelect={(card) => handleCommunityCardSelect(card, 4)}
                   title="Select River Card"
-                  disabled={!communityCards[3]}
+                  disabled={isLoading || !communityCards[3]}
                 />
               )}
             </div>
