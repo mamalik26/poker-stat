@@ -218,9 +218,13 @@ class PokerEngine:
             # Pre-flop analysis
             return self._analyze_preflop_hand(hole_cards)
         
-        # Post-flop analysis
-        current_board = community_cards
-        hand_rank = self.evaluator.evaluate(current_board, hole_cards)
+        # Check if we have enough cards for full evaluation
+        if len(community_cards) < 5:
+            # Incomplete board - use alternative analysis
+            return self._analyze_incomplete_hand(hole_cards, community_cards)
+        
+        # Complete board (5 cards) - use treys evaluator
+        hand_rank = self.evaluator.evaluate(community_cards, hole_cards)
         hand_class = self.evaluator.get_rank_class(hand_rank)
         
         # Map treys hand classes to readable descriptions
@@ -237,7 +241,7 @@ class PokerEngine:
         }
         
         hand_name = class_names.get(hand_class, "Unknown")
-        description = self._get_hand_description(hand_rank, hand_class, current_board, hole_cards)
+        description = self._get_hand_description(hand_rank, hand_class, community_cards, hole_cards)
         
         return HandStrength(
             name=hand_name,
