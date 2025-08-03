@@ -353,6 +353,9 @@ class PokerEngine:
         if 14 in sorted_ranks and 2 in sorted_ranks and 3 in sorted_ranks and 4 in sorted_ranks:
             return False, True
             
+        # Default case: no straight potential
+        return False, False
+            
     def _analyze_preflop_hand(self, hole_cards: List[int]) -> HandStrength:
         """
         Analyze pre-flop hand strength
