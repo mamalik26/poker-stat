@@ -269,6 +269,9 @@ backend:
         - working: false
         - agent: "testing"
         - comment: "❌ CRITICAL BUG - Same treys library issue. High iteration count scenarios fail due to _evaluate_current_hand() method trying to evaluate incomplete boards. Returns 500 error with message 'Internal server error during analysis: 3'"
+        - working: false
+        - agent: "testing"
+        - comment: "❌ PERFORMANCE ISSUE - Fixed the 500 error (was caused by missing return statement in _check_straight_potential method), but performance is still too slow. 100k iterations take 5.39s-10.56s, exceeding the 5s target. Core functionality works but needs optimization."
 
   - task: "POST /api/analyze-hand - Different player counts (2-10 players)"
     implemented: true
