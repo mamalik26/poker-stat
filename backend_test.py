@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend API Tests for Poker Probability Calculator
-Tests all endpoints with various scenarios including edge cases and performance testing.
+Comprehensive Backend API Tests for Poker Probability Calculator SaaS Authentication System
+Tests authentication, subscription, and protected endpoints thoroughly.
 """
 
 import requests
 import json
 import time
 import os
-from typing import Dict, Any, List
+import uuid
+from typing import Dict, Any, List, Optional
 
 # Get backend URL from environment
 BACKEND_URL = "https://86fa4beb-2f95-4b09-9924-af4fde58ca53.preview.emergentagent.com/api"
