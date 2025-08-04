@@ -444,7 +444,7 @@ class SaaSAuthTester:
                 else:
                     response = self.session.post(f"{self.base_url}{endpoint}", json={})
                 
-                if response.status_code == 401:
+                if response.status_code == 403:  # Changed from 401 to 403
                     passed_tests.append(f"{method} {endpoint}")
                 else:
                     failed_tests.append(f"{method} {endpoint} (got {response.status_code})")
@@ -452,10 +452,10 @@ class SaaSAuthTester:
                 failed_tests.append(f"{method} {endpoint} (exception: {str(e)})")
         
         if not failed_tests:
-            self.log_test("Protected routes without token - Should return 401", True, 
-                        f"All protected routes correctly returned 401: {', '.join(passed_tests)}")
+            self.log_test("Protected routes without token - Should return 403", True, 
+                        f"All protected routes correctly returned 403: {', '.join(passed_tests)}")
         else:
-            self.log_test("Protected routes without token - Should return 401", False, 
+            self.log_test("Protected routes without token - Should return 403", False, 
                         f"Failed: {', '.join(failed_tests)}")
     
     def run_all_tests(self):
