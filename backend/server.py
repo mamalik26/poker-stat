@@ -135,7 +135,8 @@ async def analyze_hand(
         try:
             hand_history = HandHistory(
                 analysis_request=request,
-                analysis_response=response
+                analysis_response=response,
+                user_id=current_user.id
             )
             await db.hand_history.insert_one(hand_history.dict())
         except Exception as e:
