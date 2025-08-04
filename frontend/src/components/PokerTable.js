@@ -90,17 +90,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
 
   return (
     <div className="w-full relative">
-      {isLoading && (
-        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-3xl flex items-center justify-center z-20">
-          <div className="bg-gradient-to-r from-[#0F3D2E] to-[#1B5E47] rounded-2xl p-6 flex items-center gap-4 shadow-2xl border border-emerald-400/20">
-            <Loader2 className="w-8 h-8 animate-spin text-emerald-300" />
-            <div className="text-white">
-              <div className="font-semibold text-lg">Analyzing Hand</div>
-              <div className="text-emerald-200 text-sm opacity-90">Running Monte Carlo simulation...</div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Removed loading overlay from here since it's now handled by the Calculate button */}
       
       {/* Header Section */}
       <div className="bg-gradient-to-r from-[#0F3D2E] to-[#1B5E47] px-8 py-6 rounded-t-3xl">
