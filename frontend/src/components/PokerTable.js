@@ -149,7 +149,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
                       selectedCards={allSelectedCards}
                       onCardSelect={(card) => handleHoleCardSelect(card, index)}
                       title={`Select Hole Card ${index + 1}`}
-                      disabled={isLoading}
+                      disabled={false}
                     />
                   </div>
                 )}
