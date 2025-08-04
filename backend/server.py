@@ -1,12 +1,14 @@
-from fastapi import FastAPI, APIRouter, HTTPException
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 import os
 import logging
 from pathlib import Path
 from models import AnalysisRequest, AnalysisResponse, HandHistory
 from poker_engine import PokerEngine, Card
+from auth_routes import router as auth_router, get_current_subscribed_user
+from auth_models import User
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
