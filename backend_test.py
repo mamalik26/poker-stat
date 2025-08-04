@@ -980,13 +980,34 @@ class PokerAPITester:
 
 def main():
     """Main test execution"""
-    tester = PokerAPITester(BACKEND_URL)
-    results = tester.run_all_tests()
+    print("🚀 Starting Comprehensive Backend Testing...")
+    print("=" * 80)
     
-    # Return exit code based on results
-    if results["failed_tests"] == 0:
+    # Test SaaS Authentication System
+    auth_tester = SaaSAuthTester(BACKEND_URL)
+    auth_results = auth_tester.run_all_tests()
+    
+    print("\n" + "=" * 80)
+    print("📋 FINAL TEST SUMMARY")
+    print("=" * 80)
+    
+    print(f"🔐 SaaS Authentication Tests: {auth_results['passed_tests']}/{auth_results['total_tests']} passed ({auth_results['success_rate']:.1f}%)")
+    
+    total_tests = auth_results['total_tests']
+    total_passed = auth_results['passed_tests']
+    total_failed = auth_results['failed_tests']
+    
+    print(f"\n📊 Overall Results:")
+    print(f"   Total Tests: {total_tests}")
+    print(f"   Passed: {total_passed}")
+    print(f"   Failed: {total_failed}")
+    print(f"   Success Rate: {(total_passed / total_tests) * 100 if total_tests > 0 else 0:.1f}%")
+    
+    if total_failed == 0:
+        print("\n🎉 ALL TESTS PASSED! SaaS Authentication System is working correctly.")
         exit(0)
     else:
+        print(f"\n⚠️  {total_failed} tests failed. Review the details above.")
         exit(1)
 
 if __name__ == "__main__":
