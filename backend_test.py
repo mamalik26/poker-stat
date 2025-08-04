@@ -14,6 +14,507 @@ from typing import Dict, Any, List, Optional
 # Get backend URL from environment
 BACKEND_URL = "https://86fa4beb-2f95-4b09-9924-af4fde58ca53.preview.emergentagent.com/api"
 
+class SaaSAuthTester:
+    def __init__(self, base_url: str):
+        self.base_url = base_url
+        self.session = requests.Session()
+        self.test_results = []
+        self.auth_token = None
+        self.test_user_email = f"testuser_{uuid.uuid4().hex[:8]}@example.com"
+        self.test_user_password = "SecurePass123!"
+        self.test_user_name = "Test User"
+        
+    def log_test(self, test_name: str, passed: bool, details: str = ""):
+        """Log test results"""
+        status = "✅ PASS" if passed else "❌ FAIL"
+        print(f"{status} {test_name}")
+        if details:
+            print(f"   Details: {details}")
+        self.test_results.append({
+            "test": test_name,
+            "passed": passed,
+            "details": details
+        })
+    
+    def set_auth_header(self, token: str):
+        """Set authorization header for authenticated requests"""
+        self.auth_token = token
+        self.session.headers.update({"Authorization": f"Bearer {token}"})
+    
+    def clear_auth_header(self):
+        """Clear authorization header"""
+        self.auth_token = None
+        if "Authorization" in self.session.headers:
+            del self.session.headers["Authorization"]
+    
+    # Authentication Tests
+    def test_user_registration(self):
+        """Test POST /api/auth/register - User registration"""
+        payload = {
+            "name": self.test_user_name,
+            "email": self.test_user_email,
+            "password": self.test_user_password
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/auth/register", json=payload)
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["access_token", "token_type", "user"]
+                user_fields = ["id", "name", "email", "subscription_status", "created_at"]
+                
+                if (all(field in data for field in required_fields) and 
+                    all(field in data["user"] for field in user_fields)):
+                    # Store token for future tests
+                    self.set_auth_header(data["access_token"])
+                    self.log_test("POST /api/auth/register - User registration", True, 
+                                f"User created: {data['user']['email']}, Status: {data['user']['subscription_status']}")
+                else:
+                    self.log_test("POST /api/auth/register - User registration", False, "Missing required fields in response")
+            else:
+                self.log_test("POST /api/auth/register - User registration", False, 
+                            f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("POST /api/auth/register - User registration", False, f"Exception: {str(e)}")
+    
+    def test_user_login(self):
+        """Test POST /api/auth/login - User login"""
+        payload = {
+            "email": self.test_user_email,
+            "password": self.test_user_password
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/auth/login", json=payload)
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["access_token", "token_type", "user"]
+                
+                if all(field in data for field in required_fields):
+                    # Update token for future tests
+                    self.set_auth_header(data["access_token"])
+                    self.log_test("POST /api/auth/login - User login", True, 
+                                f"Login successful for: {data['user']['email']}")
+                else:
+                    self.log_test("POST /api/auth/login - User login", False, "Missing required fields in response")
+            else:
+                self.log_test("POST /api/auth/login - User login", False, 
+                            f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("POST /api/auth/login - User login", False, f"Exception: {str(e)}")
+    
+    def test_get_current_user(self):
+        """Test GET /api/auth/me - Get current user info"""
+        try:
+            response = self.session.get(f"{self.base_url}/auth/me")
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["id", "name", "email", "subscription_status", "created_at"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("GET /api/auth/me - Get current user info", True, 
+                                f"User info retrieved: {data['email']}, Subscription: {data['subscription_status']}")
+                else:
+                    self.log_test("GET /api/auth/me - Get current user info", False, "Missing required fields in response")
+            else:
+                self.log_test("GET /api/auth/me - Get current user info", False, 
+                            f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("GET /api/auth/me - Get current user info", False, f"Exception: {str(e)}")
+    
+    def test_forgot_password(self):
+        """Test POST /api/auth/forgot-password - Password reset request"""
+        payload = {
+            "email": self.test_user_email
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/auth/forgot-password", json=payload)
+            if response.status_code == 200:
+                data = response.json()
+                if "message" in data:
+                    # Check if reset token is provided (for testing purposes)
+                    has_token = "reset_token" in data
+                    self.log_test("POST /api/auth/forgot-password - Password reset request", True, 
+                                f"Reset request processed, Token provided: {has_token}")
+                else:
+                    self.log_test("POST /api/auth/forgot-password - Password reset request", False, "Missing message in response")
+            else:
+                self.log_test("POST /api/auth/forgot-password - Password reset request", False, 
+                            f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("POST /api/auth/forgot-password - Password reset request", False, f"Exception: {str(e)}")
+    
+    def test_reset_password(self):
+        """Test POST /api/auth/reset-password - Reset password with token"""
+        # First get a reset token
+        forgot_payload = {"email": self.test_user_email}
+        
+        try:
+            forgot_response = self.session.post(f"{self.base_url}/auth/forgot-password", json=forgot_payload)
+            if forgot_response.status_code == 200:
+                forgot_data = forgot_response.json()
+                if "reset_token" in forgot_data:
+                    # Use the token to reset password
+                    reset_payload = {
+                        "token": forgot_data["reset_token"],
+                        "new_password": "NewSecurePass123!"
+                    }
+                    
+                    reset_response = self.session.post(f"{self.base_url}/auth/reset-password", json=reset_payload)
+                    if reset_response.status_code == 200:
+                        reset_data = reset_response.json()
+                        if "message" in reset_data:
+                            self.log_test("POST /api/auth/reset-password - Reset password with token", True, 
+                                        "Password reset successful")
+                        else:
+                            self.log_test("POST /api/auth/reset-password - Reset password with token", False, 
+                                        "Missing message in response")
+                    else:
+                        self.log_test("POST /api/auth/reset-password - Reset password with token", False, 
+                                    f"Reset failed - Status: {reset_response.status_code}")
+                else:
+                    self.log_test("POST /api/auth/reset-password - Reset password with token", False, 
+                                "No reset token provided in forgot password response")
+            else:
+                self.log_test("POST /api/auth/reset-password - Reset password with token", False, 
+                            "Failed to get reset token")
+        except Exception as e:
+            self.log_test("POST /api/auth/reset-password - Reset password with token", False, f"Exception: {str(e)}")
+    
+    def test_logout(self):
+        """Test POST /api/auth/logout - User logout"""
+        try:
+            response = self.session.post(f"{self.base_url}/auth/logout")
+            if response.status_code == 200:
+                data = response.json()
+                if "message" in data:
+                    self.log_test("POST /api/auth/logout - User logout", True, "Logout successful")
+                else:
+                    self.log_test("POST /api/auth/logout - User logout", False, "Missing message in response")
+            else:
+                self.log_test("POST /api/auth/logout - User logout", False, 
+                            f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("POST /api/auth/logout - User logout", False, f"Exception: {str(e)}")
+    
+    # Subscription Tests
+    def test_get_subscription_packages(self):
+        """Test GET /api/auth/packages - Get available subscription packages"""
+        try:
+            response = self.session.get(f"{self.base_url}/auth/packages")
+            if response.status_code == 200:
+                data = response.json()
+                if isinstance(data, list) and len(data) > 0:
+                    # Check if packages have required fields
+                    required_fields = ["id", "name", "price", "currency", "description", "features"]
+                    valid_packages = all(
+                        all(field in package for field in required_fields)
+                        for package in data
+                    )
+                    
+                    if valid_packages:
+                        package_names = [pkg["name"] for pkg in data]
+                        self.log_test("GET /api/auth/packages - Get available subscription packages", True, 
+                                    f"Found {len(data)} packages: {', '.join(package_names)}")
+                    else:
+                        self.log_test("GET /api/auth/packages - Get available subscription packages", False, 
+                                    "Packages missing required fields")
+                else:
+                    self.log_test("GET /api/auth/packages - Get available subscription packages", False, 
+                                "No packages found or invalid format")
+            else:
+                self.log_test("GET /api/auth/packages - Get available subscription packages", False, 
+                            f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("GET /api/auth/packages - Get available subscription packages", False, f"Exception: {str(e)}")
+    
+    def test_create_checkout_session(self):
+        """Test POST /api/auth/checkout - Create Stripe checkout session (requires auth)"""
+        payload = {
+            "package_id": "monthly",
+            "origin_url": "https://86fa4beb-2f95-4b09-9924-af4fde58ca53.preview.emergentagent.com"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/auth/checkout", json=payload)
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["session_id", "checkout_url"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_test("POST /api/auth/checkout - Create Stripe checkout session", True, 
+                                f"Checkout session created: {data['session_id']}")
+                else:
+                    self.log_test("POST /api/auth/checkout - Create Stripe checkout session", False, 
+                                "Missing required fields in response")
+            else:
+                self.log_test("POST /api/auth/checkout - Create Stripe checkout session", False, 
+                            f"Status code: {response.status_code}, Response: {response.text}")
+        except Exception as e:
+            self.log_test("POST /api/auth/checkout - Create Stripe checkout session", False, f"Exception: {str(e)}")
+    
+    def test_check_payment_status(self):
+        """Test GET /api/auth/payment/status/{session_id} - Check payment status (requires auth)"""
+        # First create a checkout session to get a session_id
+        checkout_payload = {
+            "package_id": "monthly",
+            "origin_url": "https://86fa4beb-2f95-4b09-9924-af4fde58ca53.preview.emergentagent.com"
+        }
+        
+        try:
+            checkout_response = self.session.post(f"{self.base_url}/auth/checkout", json=checkout_payload)
+            if checkout_response.status_code == 200:
+                checkout_data = checkout_response.json()
+                session_id = checkout_data.get("session_id")
+                
+                if session_id:
+                    # Check payment status
+                    status_response = self.session.get(f"{self.base_url}/auth/payment/status/{session_id}")
+                    if status_response.status_code == 200:
+                        status_data = status_response.json()
+                        required_fields = ["session_id", "payment_status", "status"]
+                        
+                        if all(field in status_data for field in required_fields):
+                            self.log_test("GET /api/auth/payment/status/{session_id} - Check payment status", True, 
+                                        f"Status: {status_data['payment_status']}, Session: {status_data['session_id']}")
+                        else:
+                            self.log_test("GET /api/auth/payment/status/{session_id} - Check payment status", False, 
+                                        "Missing required fields in response")
+                    else:
+                        self.log_test("GET /api/auth/payment/status/{session_id} - Check payment status", False, 
+                                    f"Status code: {status_response.status_code}")
+                else:
+                    self.log_test("GET /api/auth/payment/status/{session_id} - Check payment status", False, 
+                                "No session_id from checkout")
+            else:
+                self.log_test("GET /api/auth/payment/status/{session_id} - Check payment status", False, 
+                            "Failed to create checkout session for testing")
+        except Exception as e:
+            self.log_test("GET /api/auth/payment/status/{session_id} - Check payment status", False, f"Exception: {str(e)}")
+    
+    def test_stripe_webhook(self):
+        """Test POST /api/auth/webhook/stripe - Handle Stripe webhooks"""
+        # This is a basic test - real webhooks would come from Stripe with proper signatures
+        payload = {
+            "id": "evt_test_webhook",
+            "object": "event",
+            "type": "checkout.session.completed",
+            "data": {
+                "object": {
+                    "id": "cs_test_session",
+                    "payment_status": "paid"
+                }
+            }
+        }
+        
+        try:
+            # Note: This will likely fail without proper Stripe signature, but we test the endpoint exists
+            response = self.session.post(f"{self.base_url}/auth/webhook/stripe", json=payload)
+            # Accept both 200 (success) and 400 (signature validation failure) as valid responses
+            if response.status_code in [200, 400]:
+                self.log_test("POST /api/auth/webhook/stripe - Handle Stripe webhooks", True, 
+                            f"Webhook endpoint accessible, Status: {response.status_code}")
+            else:
+                self.log_test("POST /api/auth/webhook/stripe - Handle Stripe webhooks", False, 
+                            f"Unexpected status code: {response.status_code}")
+        except Exception as e:
+            self.log_test("POST /api/auth/webhook/stripe - Handle Stripe webhooks", False, f"Exception: {str(e)}")
+    
+    # Access Control Tests
+    def test_analyze_hand_without_auth(self):
+        """Test POST /api/analyze-hand without authentication (should get 401)"""
+        # Clear auth header
+        self.clear_auth_header()
+        
+        payload = {
+            "hole_cards": [
+                {"rank": "A", "suit": "spades"},
+                {"rank": "K", "suit": "hearts"}
+            ],
+            "community_cards": [None, None, None, None, None],
+            "player_count": 2,
+            "simulation_iterations": 10000
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/analyze-hand", json=payload)
+            if response.status_code == 401:
+                self.log_test("POST /api/analyze-hand - Without authentication (should get 401)", True, 
+                            "Correctly returned 401 Unauthorized")
+            else:
+                self.log_test("POST /api/analyze-hand - Without authentication (should get 401)", False, 
+                            f"Expected 401, got {response.status_code}")
+        except Exception as e:
+            self.log_test("POST /api/analyze-hand - Without authentication (should get 401)", False, f"Exception: {str(e)}")
+    
+    def test_analyze_hand_with_auth_no_subscription(self):
+        """Test POST /api/analyze-hand with authentication but no subscription (should get 403)"""
+        # Re-login to get auth token
+        login_payload = {
+            "email": self.test_user_email,
+            "password": self.test_user_password
+        }
+        
+        try:
+            login_response = self.session.post(f"{self.base_url}/auth/login", json=login_payload)
+            if login_response.status_code == 200:
+                login_data = login_response.json()
+                self.set_auth_header(login_data["access_token"])
+                
+                # Try to analyze hand (should fail due to no subscription)
+                payload = {
+                    "hole_cards": [
+                        {"rank": "A", "suit": "spades"},
+                        {"rank": "K", "suit": "hearts"}
+                    ],
+                    "community_cards": [None, None, None, None, None],
+                    "player_count": 2,
+                    "simulation_iterations": 10000
+                }
+                
+                response = self.session.post(f"{self.base_url}/analyze-hand", json=payload)
+                if response.status_code == 403:
+                    self.log_test("POST /api/analyze-hand - With auth but no subscription (should get 403)", True, 
+                                "Correctly returned 403 Forbidden - subscription required")
+                else:
+                    self.log_test("POST /api/analyze-hand - With auth but no subscription (should get 403)", False, 
+                                f"Expected 403, got {response.status_code}")
+            else:
+                self.log_test("POST /api/analyze-hand - With auth but no subscription (should get 403)", False, 
+                            "Failed to login for test")
+        except Exception as e:
+            self.log_test("POST /api/analyze-hand - With auth but no subscription (should get 403)", False, f"Exception: {str(e)}")
+    
+    # Error Handling Tests
+    def test_registration_with_existing_email(self):
+        """Test registration with existing email (should fail)"""
+        payload = {
+            "name": "Another User",
+            "email": self.test_user_email,  # Same email as registered user
+            "password": "AnotherPassword123!"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/auth/register", json=payload)
+            if response.status_code == 400:
+                self.log_test("POST /api/auth/register - With existing email (should fail)", True, 
+                            "Correctly returned 400 Bad Request for duplicate email")
+            else:
+                self.log_test("POST /api/auth/register - With existing email (should fail)", False, 
+                            f"Expected 400, got {response.status_code}")
+        except Exception as e:
+            self.log_test("POST /api/auth/register - With existing email (should fail)", False, f"Exception: {str(e)}")
+    
+    def test_login_with_wrong_credentials(self):
+        """Test login with wrong credentials (should fail)"""
+        payload = {
+            "email": self.test_user_email,
+            "password": "WrongPassword123!"
+        }
+        
+        try:
+            response = self.session.post(f"{self.base_url}/auth/login", json=payload)
+            if response.status_code == 401:
+                self.log_test("POST /api/auth/login - With wrong credentials (should fail)", True, 
+                            "Correctly returned 401 Unauthorized for wrong password")
+            else:
+                self.log_test("POST /api/auth/login - With wrong credentials (should fail)", False, 
+                            f"Expected 401, got {response.status_code}")
+        except Exception as e:
+            self.log_test("POST /api/auth/login - With wrong credentials (should fail)", False, f"Exception: {str(e)}")
+    
+    def test_protected_routes_without_token(self):
+        """Test accessing protected routes without token"""
+        self.clear_auth_header()
+        
+        protected_endpoints = [
+            ("GET", "/auth/me"),
+            ("POST", "/auth/checkout"),
+            ("GET", "/auth/payment/status/test_session")
+        ]
+        
+        passed_tests = []
+        failed_tests = []
+        
+        for method, endpoint in protected_endpoints:
+            try:
+                if method == "GET":
+                    response = self.session.get(f"{self.base_url}{endpoint}")
+                else:
+                    response = self.session.post(f"{self.base_url}{endpoint}", json={})
+                
+                if response.status_code == 401:
+                    passed_tests.append(f"{method} {endpoint}")
+                else:
+                    failed_tests.append(f"{method} {endpoint} (got {response.status_code})")
+            except Exception as e:
+                failed_tests.append(f"{method} {endpoint} (exception: {str(e)})")
+        
+        if not failed_tests:
+            self.log_test("Protected routes without token - Should return 401", True, 
+                        f"All protected routes correctly returned 401: {', '.join(passed_tests)}")
+        else:
+            self.log_test("Protected routes without token - Should return 401", False, 
+                        f"Failed: {', '.join(failed_tests)}")
+    
+    def run_all_tests(self):
+        """Run all SaaS authentication tests and return summary"""
+        print("🔐 Starting SaaS Authentication System Tests...")
+        print(f"Testing backend at: {self.base_url}")
+        print("=" * 60)
+        
+        # Authentication Flow Tests
+        print("\n📝 Authentication Flow Tests:")
+        self.test_user_registration()
+        self.test_user_login()
+        self.test_get_current_user()
+        self.test_forgot_password()
+        self.test_reset_password()
+        self.test_logout()
+        
+        # Subscription Tests
+        print("\n💳 Subscription Tests:")
+        self.test_get_subscription_packages()
+        self.test_create_checkout_session()
+        self.test_check_payment_status()
+        self.test_stripe_webhook()
+        
+        # Access Control Tests
+        print("\n🛡️ Access Control Tests:")
+        self.test_analyze_hand_without_auth()
+        self.test_analyze_hand_with_auth_no_subscription()
+        
+        # Error Handling Tests
+        print("\n⚠️ Error Handling Tests:")
+        self.test_registration_with_existing_email()
+        self.test_login_with_wrong_credentials()
+        self.test_protected_routes_without_token()
+        
+        # Summary
+        print("=" * 60)
+        passed = sum(1 for result in self.test_results if result["passed"])
+        total = len(self.test_results)
+        print(f"📊 Test Summary: {passed}/{total} tests passed")
+        
+        if passed == total:
+            print("🎉 All SaaS authentication tests passed! System is working correctly.")
+        else:
+            print("⚠️  Some tests failed. Check details above.")
+            failed_tests = [result for result in self.test_results if not result["passed"]]
+            print("\nFailed tests:")
+            for test in failed_tests:
+                print(f"  ❌ {test['test']}: {test['details']}")
+        
+        return {
+            "total_tests": total,
+            "passed_tests": passed,
+            "failed_tests": total - passed,
+            "success_rate": (passed / total) * 100 if total > 0 else 0,
+            "all_results": self.test_results
+        }
+
+
 class PokerAPITester:
     def __init__(self, base_url: str):
         self.base_url = base_url
