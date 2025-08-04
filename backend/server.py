@@ -189,10 +189,16 @@ async def health_check():
 app.include_router(api_router)
 app.include_router(auth_router)
 
+# Get allowed origins from environment
+allowed_origins = [
+    "http://localhost:3000",  # Local development
+    "https://86fa4beb-2f95-4b09-9924-af4fde58ca53.preview.emergentagent.com",  # Production domain
+]
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
