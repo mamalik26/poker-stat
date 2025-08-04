@@ -21,6 +21,7 @@ import ThankYou from './pages/ThankYou';
 // Original calculator components
 import PokerTable from './components/PokerTable';
 import ProbabilityDashboard from './components/ProbabilityDashboard';
+import TestCalculator from './TestCalculator';
 import { AuthAPI } from './services/authAPI';
 import { validateCards } from './services/pokerAPI';
 import { useToast } from './hooks/use-toast';
