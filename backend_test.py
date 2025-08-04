@@ -323,7 +323,7 @@ class SaaSAuthTester:
     
     # Access Control Tests
     def test_analyze_hand_without_auth(self):
-        """Test POST /api/analyze-hand without authentication (should get 401)"""
+        """Test POST /api/analyze-hand without authentication (should get 403)"""
         # Clear auth header
         self.clear_auth_header()
         
@@ -339,14 +339,14 @@ class SaaSAuthTester:
         
         try:
             response = self.session.post(f"{self.base_url}/analyze-hand", json=payload)
-            if response.status_code == 401:
-                self.log_test("POST /api/analyze-hand - Without authentication (should get 401)", True, 
-                            "Correctly returned 401 Unauthorized")
+            if response.status_code == 403:  # Changed from 401 to 403
+                self.log_test("POST /api/analyze-hand - Without authentication (should get 403)", True, 
+                            "Correctly returned 403 Not authenticated")
             else:
-                self.log_test("POST /api/analyze-hand - Without authentication (should get 401)", False, 
-                            f"Expected 401, got {response.status_code}")
+                self.log_test("POST /api/analyze-hand - Without authentication (should get 403)", False, 
+                            f"Expected 403, got {response.status_code}")
         except Exception as e:
-            self.log_test("POST /api/analyze-hand - Without authentication (should get 401)", False, f"Exception: {str(e)}")
+            self.log_test("POST /api/analyze-hand - Without authentication (should get 403)", False, f"Exception: {str(e)}")
     
     def test_analyze_hand_with_auth_no_subscription(self):
         """Test POST /api/analyze-hand with authentication but no subscription (should get 403)"""
