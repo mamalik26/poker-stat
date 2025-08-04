@@ -115,13 +115,43 @@ function App() {
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
           {/* Poker Table - Takes 3/5 of space on XL screens */}
-          <div className="xl:col-span-3">
+          <div className="xl:col-span-3 space-y-6">
             <div className="bg-gradient-to-br from-[#2A2A2A] to-[#1F1F1F] rounded-3xl shadow-2xl border border-gray-700/50 overflow-hidden">
               <PokerTable 
                 onCardsChange={handleCardsChange}
                 onPlayersChange={handlePlayersChange}
                 isLoading={isLoading}
               />
+            </div>
+            
+            {/* Calculate Button Section */}
+            <div className="flex justify-center">
+              <button
+                onClick={handleCalculate}
+                disabled={!canCalculate || isLoading}
+                className={`
+                  px-8 py-4 rounded-2xl font-bold text-lg tracking-wide transition-all duration-300
+                  flex items-center gap-3 shadow-xl
+                  ${canCalculate && !isLoading
+                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white hover:shadow-2xl hover:shadow-emerald-500/25 hover:-translate-y-1 hover:scale-105' 
+                    : 'bg-gradient-to-r from-gray-600 to-gray-700 text-gray-300 cursor-not-allowed opacity-60'
+                  }
+                `}
+                aria-label="Calculate hand probabilities using Monte Carlo simulation"
+                title={canCalculate ? "Run Monte Carlo simulation (100,000 iterations)" : "Select both hole cards to enable calculation"}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                    Analyzing Hand...
+                  </>
+                ) : (
+                  <>
+                    <span className="text-2xl">🎯</span>
+                    Calculate Probabilities
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
