@@ -83,7 +83,7 @@ const CardSelector = ({ selectedCards, onCardSelect, title, disabled = false }) 
           </div>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden bg-gradient-to-br from-[#2A2A2A] to-[#1F1F1F] border border-gray-700/50 rounded-2xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-hidden bg-gradient-to-br from-[#2A2A2A] to-[#1F1F1F] border border-gray-700/50 rounded-2xl">
         <DialogHeader className="pb-4 border-b border-gray-700/50">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-bold text-gray-100 flex items-center gap-2">
@@ -99,6 +99,7 @@ const CardSelector = ({ selectedCards, onCardSelect, title, disabled = false }) 
               <X className="w-5 h-5" />
             </Button>
           </div>
+          <p className="text-sm text-gray-400 mt-1">Sélectionnez une carte pour continuer</p>
         </DialogHeader>
         
         {/* Grille compacte des cartes */}
