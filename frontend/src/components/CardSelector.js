@@ -103,20 +103,23 @@ const CardSelector = ({ selectedCards, onCardSelect, title, disabled = false }) 
         </DialogHeader>
         
         {/* Grille compacte des cartes */}
-        <div className="p-4 overflow-y-auto max-h-[70vh]">
-          <div className="space-y-3">
+        <div className="p-4 overflow-y-auto max-h-[70vh] scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+          <div className="space-y-4">
             {rankOrder.map(rank => (
-              <div key={rank} className="space-y-2">
+              <div key={rank} className="group">
                 {/* En-tête de rang */}
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 bg-gray-700/50 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">{rank}</span>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-gradient-to-br from-gray-600 to-gray-700 rounded-xl flex items-center justify-center shadow-lg">
+                    <span className="text-white font-bold text-base">{rank}</span>
                   </div>
-                  <div className="h-px bg-gradient-to-r from-gray-600 to-transparent flex-1"></div>
+                  <div className="h-px bg-gradient-to-r from-gray-600 via-gray-500 to-transparent flex-1"></div>
+                  <div className="text-xs text-gray-500 font-medium px-2">
+                    {rank === 'A' ? 'As' : rank === 'K' ? 'Roi' : rank === 'Q' ? 'Dame' : rank === 'J' ? 'Valet' : rank}
+                  </div>
                 </div>
                 
                 {/* Cartes de ce rang en ligne (4 couleurs) */}
-                <div className="grid grid-cols-4 gap-2 pl-1">
+                <div className="grid grid-cols-4 gap-3 pl-2 justify-items-center">
                   {suitOrder.map(suit => {
                     const card = cardsByRank[rank]?.find(c => c.suit === suit);
                     return card ? (
@@ -128,7 +131,7 @@ const CardSelector = ({ selectedCards, onCardSelect, title, disabled = false }) 
                         isSelected={false}
                       />
                     ) : (
-                      <div key={`${rank}-${suit}-empty`} className="w-12 h-16"></div>
+                      <div key={`${rank}-${suit}-empty`} className="w-12 h-16 opacity-20"></div>
                     );
                   })}
                 </div>
@@ -137,23 +140,26 @@ const CardSelector = ({ selectedCards, onCardSelect, title, disabled = false }) 
           </div>
           
           {/* Légende des couleurs */}
-          <div className="mt-6 pt-4 border-t border-gray-700/50">
-            <div className="flex justify-center gap-6 text-sm">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl text-gray-900">♠</span>
-                <span className="text-gray-400">Piques</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl text-red-600">♥</span>
-                <span className="text-gray-400">Cœurs</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl text-red-600">♦</span>
-                <span className="text-gray-400">Carreaux</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-2xl text-gray-900">♣</span>
-                <span className="text-gray-400">Trèfles</span>
+          <div className="mt-8 pt-6 border-t border-gray-700/50">
+            <div className="bg-gray-800/30 rounded-xl p-4">
+              <h4 className="text-sm font-semibold text-gray-300 mb-3 text-center">Couleurs</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                <div className="flex items-center gap-2 justify-center">
+                  <span className="text-xl text-gray-900">♠</span>
+                  <span className="text-gray-400">Piques</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <span className="text-xl text-red-600">♥</span>
+                  <span className="text-gray-400">Cœurs</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <span className="text-xl text-red-600">♦</span>
+                  <span className="text-gray-400">Carreaux</span>
+                </div>
+                <div className="flex items-center gap-2 justify-center">
+                  <span className="text-xl text-gray-900">♣</span>
+                  <span className="text-gray-400">Trèfles</span>
+                </div>
               </div>
             </div>
           </div>
