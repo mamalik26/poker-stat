@@ -240,14 +240,14 @@ class SaaSAuthTester:
             response = self.session.post(f"{self.base_url}/auth/checkout", json=payload)
             if response.status_code == 200:
                 data = response.json()
-                required_fields = ["session_id", "checkout_url"]
+                required_fields = ["session_id", "url"]  # Changed from checkout_url to url
                 
                 if all(field in data for field in required_fields):
                     self.log_test("POST /api/auth/checkout - Create Stripe checkout session", True, 
                                 f"Checkout session created: {data['session_id']}")
                 else:
                     self.log_test("POST /api/auth/checkout - Create Stripe checkout session", False, 
-                                "Missing required fields in response")
+                                f"Missing required fields in response. Got: {list(data.keys())}")
             else:
                 self.log_test("POST /api/auth/checkout - Create Stripe checkout session", False, 
                             f"Status code: {response.status_code}, Response: {response.text}")
