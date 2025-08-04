@@ -20,7 +20,7 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI(
-    title="Poker Probability Calculator API",
+    title="Poker Pro Calculator API",
     description="Advanced Texas Hold'em probability analysis with Monte Carlo simulations",
     version="1.0.0"
 )
@@ -30,6 +30,10 @@ api_router = APIRouter(prefix="/api")
 
 # Initialize poker engine
 poker_engine = PokerEngine()
+
+# Get database function for dependency injection
+def get_db() -> AsyncIOMotorDatabase:
+    return db
 
 @api_router.post("/analyze-hand", response_model=AnalysisResponse)
 async def analyze_hand(request: AnalysisRequest):
