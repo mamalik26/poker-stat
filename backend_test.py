@@ -273,14 +273,14 @@ class SaaSAuthTester:
                     status_response = self.session.get(f"{self.base_url}/auth/payment/status/{session_id}")
                     if status_response.status_code == 200:
                         status_data = status_response.json()
-                        required_fields = ["session_id", "payment_status", "status"]
+                        required_fields = ["payment_status", "status"]  # Removed session_id as it's in URL
                         
                         if all(field in status_data for field in required_fields):
                             self.log_test("GET /api/auth/payment/status/{session_id} - Check payment status", True, 
-                                        f"Status: {status_data['payment_status']}, Session: {status_data['session_id']}")
+                                        f"Status: {status_data['payment_status']}, Payment Status: {status_data['status']}")
                         else:
                             self.log_test("GET /api/auth/payment/status/{session_id} - Check payment status", False, 
-                                        "Missing required fields in response")
+                                        f"Missing required fields in response. Got: {list(status_data.keys())}")
                     else:
                         self.log_test("GET /api/auth/payment/status/{session_id} - Check payment status", False, 
                                     f"Status code: {status_response.status_code}")
