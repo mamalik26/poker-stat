@@ -9,6 +9,7 @@ export class AuthAPI {
   static getAuthHeaders() {
     const token = Cookies.get('access_token');
     if (token) {
+      // Token is already in "Bearer xxx" format from backend
       return {
         'Authorization': token
       };
