@@ -213,6 +213,9 @@ function App() {
               </ProtectedRoute>
             } />
 
+            {/* Test route for card selector */}
+            <Route path="/test-calculator" element={<TestCalculator />} />
+
             {/* Default redirect */}
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>
