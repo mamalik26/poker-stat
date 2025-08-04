@@ -224,7 +224,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
                   selectedCards={allSelectedCards}
                   onCardSelect={(card) => handleCommunityCardSelect(card, 3)}
                   title="Select Turn Card"
-                  disabled={isLoading || !communityCards[2]}
+                  disabled={!communityCards[2]}
                 />
               )}
             </div>
