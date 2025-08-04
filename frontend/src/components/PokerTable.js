@@ -252,7 +252,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
                   selectedCards={allSelectedCards}
                   onCardSelect={(card) => handleCommunityCardSelect(card, 4)}
                   title="Select River Card"
-                  disabled={isLoading || !communityCards[3]}
+                  disabled={!communityCards[3]}
                 />
               )}
             </div>
