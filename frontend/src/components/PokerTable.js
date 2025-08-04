@@ -217,7 +217,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
                   card={communityCards[3]} 
                   onRemove={(pos) => removeCard('community', pos)}
                   position={3}
-                  disabled={isLoading}
+                  disabled={false}
                 />
               ) : (
                 <CardSelector
