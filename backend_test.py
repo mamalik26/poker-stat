@@ -350,17 +350,22 @@ class SaaSAuthTester:
     
     def test_analyze_hand_with_auth_no_subscription(self):
         """Test POST /api/analyze-hand with authentication but no subscription (should get 403)"""
-        # Re-login to get auth token
-        login_payload = {
-            "email": self.test_user_email,
-            "password": self.test_user_password
+        # Create a new user for this test to avoid password reset issues
+        new_user_email = f"nosubscription_{uuid.uuid4().hex[:8]}@example.com"
+        new_user_password = "NoSubPass123!"
+        
+        # Register new user
+        register_payload = {
+            "name": "No Subscription User",
+            "email": new_user_email,
+            "password": new_user_password
         }
         
         try:
-            login_response = self.session.post(f"{self.base_url}/auth/login", json=login_payload)
-            if login_response.status_code == 200:
-                login_data = login_response.json()
-                self.set_auth_header(login_data["access_token"])
+            register_response = self.session.post(f"{self.base_url}/auth/register", json=register_payload)
+            if register_response.status_code == 200:
+                register_data = register_response.json()
+                self.set_auth_header(register_data["access_token"])
                 
                 # Try to analyze hand (should fail due to no subscription)
                 payload = {
@@ -379,10 +384,10 @@ class SaaSAuthTester:
                                 "Correctly returned 403 Forbidden - subscription required")
                 else:
                     self.log_test("POST /api/analyze-hand - With auth but no subscription (should get 403)", False, 
-                                f"Expected 403, got {response.status_code}")
+                                f"Expected 403, got {response.status_code}, Response: {response.text}")
             else:
                 self.log_test("POST /api/analyze-hand - With auth but no subscription (should get 403)", False, 
-                            "Failed to login for test")
+                            f"Failed to register test user: {register_response.status_code}")
         except Exception as e:
             self.log_test("POST /api/analyze-hand - With auth but no subscription (should get 403)", False, f"Exception: {str(e)}")
     
