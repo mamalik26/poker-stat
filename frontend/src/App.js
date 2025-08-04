@@ -1,12 +1,32 @@
 import React, { useState, useCallback } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import './App.css';
-import PokerTable from './components/PokerTable';
-import ProbabilityDashboard from './components/ProbabilityDashboard';
-import { PokerAPI, validateCards } from './services/pokerAPI';
-import { useToast } from './hooks/use-toast';
+
+// Context
+import { AuthProvider } from './contexts/AuthContext';
+
+// Components
+import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from './components/ui/toaster';
 
-function App() {
+// Pages
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import Dashboard from './pages/Dashboard';
+import Pricing from './pages/Pricing';
+import ThankYou from './pages/ThankYou';
+
+// Original calculator components
+import PokerTable from './components/PokerTable';
+import ProbabilityDashboard from './components/ProbabilityDashboard';
+import { AuthAPI } from './services/authAPI';
+import { validateCards } from './services/pokerAPI';
+import { useToast } from './hooks/use-toast';
+
+// Calculator component (protected)
+const Calculator = () => {
   const [analysis, setAnalysis] = useState(null);
   const [playerCount, setPlayerCount] = useState(2);
   const [isLoading, setIsLoading] = useState(false);
@@ -14,17 +34,13 @@ function App() {
   const { toast } = useToast();
 
   const handleCardsChange = useCallback((holeCards, communityCards) => {
-    // Update card state without triggering calculation
     setCurrentCards({ holeCards, communityCards });
-    
-    // Reset analysis when cards change
     setAnalysis(null);
   }, []);
 
   const handleCalculate = useCallback(async () => {
     const { holeCards, communityCards } = currentCards;
     
-    // Validate we have hole cards
     const validHoleCards = holeCards.filter(Boolean);
     if (validHoleCards.length < 2) {
       toast({
@@ -35,7 +51,6 @@ function App() {
       return;
     }
 
-    // Validate cards
     const validationErrors = validateCards(holeCards, communityCards);
     if (validationErrors.length > 0) {
       toast({
@@ -49,22 +64,32 @@ function App() {
     setIsLoading(true);
     
     try {
-      const result = await PokerAPI.analyzeHand(
-        holeCards, 
-        communityCards, 
-        playerCount, 
-        100000 // simulation iterations
-      );
+      // Use authenticated poker API
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/analyze-hand`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...AuthAPI.getAuthHeaders()
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          hole_cards: holeCards.filter(Boolean),
+          community_cards: communityCards,
+          player_count: playerCount,
+          simulation_iterations: 100000
+        })
+      });
 
-      if (result.success) {
-        setAnalysis(result.data);
+      if (response.ok) {
+        const data = await response.json();
+        setAnalysis(data);
       } else {
+        const errorData = await response.json();
         toast({
           title: "Analysis Failed",
-          description: result.error || "Failed to analyze hand",
+          description: errorData.detail || "Failed to analyze hand",
           variant: "destructive",
         });
-        setAnalysis(null);
       }
     } catch (error) {
       console.error('Error during analysis:', error);
@@ -73,7 +98,6 @@ function App() {
         description: "An unexpected error occurred during analysis",
         variant: "destructive",
       });
-      setAnalysis(null);
     } finally {
       setIsLoading(false);
     }
@@ -81,16 +105,13 @@ function App() {
 
   const handlePlayersChange = useCallback((count) => {
     setPlayerCount(count);
-    // Clear analysis when player count changes
     setAnalysis(null);
   }, []);
 
-  // Check if we have valid cards to enable Calculate button
   const canCalculate = currentCards.holeCards.filter(Boolean).length === 2;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1E1E1E] via-[#2D2D2D] to-[#1A1A1A] font-['Inter',sans-serif] text-gray-100">
-      {/* Header Section */}
       <div className="bg-gradient-to-r from-[#0F3D2E] to-[#1B5E47] shadow-2xl">
         <div className="max-w-7xl mx-auto px-6 py-8">
           <div className="text-center">
@@ -100,21 +121,12 @@ function App() {
             <p className="text-lg text-emerald-200 opacity-90 font-medium">
               Advanced Texas Hold'em Probability Analysis
             </p>
-            <div className="mt-4 flex justify-center">
-              <div className="bg-black/20 backdrop-blur-sm rounded-full px-6 py-2 border border-emerald-400/30">
-                <span className="text-emerald-300 text-sm font-medium">
-                  Powered by Monte Carlo Simulations (100k+ iterations)
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 xl:grid-cols-5 gap-8">
-          {/* Poker Table - Takes 3/5 of space on XL screens */}
           <div className="xl:col-span-3 space-y-6">
             <div className="bg-gradient-to-br from-[#2A2A2A] to-[#1F1F1F] rounded-3xl shadow-2xl border border-gray-700/50 overflow-hidden">
               <PokerTable 
@@ -124,7 +136,6 @@ function App() {
               />
             </div>
             
-            {/* Calculate Button Section */}
             <div className="flex justify-center">
               <button
                 onClick={handleCalculate}
@@ -155,7 +166,6 @@ function App() {
             </div>
           </div>
 
-          {/* Analysis Dashboard - Takes 2/5 of space on XL screens */}
           <div className="xl:col-span-2">
             <div className="bg-gradient-to-br from-[#2A2A2A] to-[#1F1F1F] rounded-3xl shadow-2xl border border-gray-700/50 p-6 h-full">
               <ProbabilityDashboard 
@@ -166,31 +176,50 @@ function App() {
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="mt-12 text-center">
-          <div className="bg-gradient-to-r from-[#2A2A2A] to-[#1F1F1F] rounded-2xl border border-gray-700/50 p-6 shadow-xl">
-            <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-gray-400">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                <span className="font-medium">Real-time Analysis</span>
-              </div>
-              <div className="hidden md:block w-px h-4 bg-gray-600"></div>
-              <div className="flex items-center gap-2">
-                <span className="text-emerald-400">⚡</span>
-                <span>Advanced Algorithms</span>
-              </div>
-              <div className="hidden md:block w-px h-4 bg-gray-600"></div>
-              <div className="flex items-center gap-2">
-                <span className="text-blue-400">🎯</span>
-                <span>Professional Insights</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
-      <Toaster />
     </div>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <div className="App">
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/pricing" element={<Pricing />} />
+
+            {/* Protected routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            
+            <Route path="/thank-you" element={
+              <ProtectedRoute>
+                <ThankYou />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/calculator" element={
+              <ProtectedRoute requireSubscription={true}>
+                <Calculator />
+              </ProtectedRoute>
+            } />
+
+            {/* Default redirect */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+          <Toaster />
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
