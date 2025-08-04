@@ -141,7 +141,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
                     card={card} 
                     onRemove={(pos) => removeCard('hole', pos)}
                     position={index}
-                    disabled={isLoading}
+                    disabled={false}
                   />
                 ) : (
                   <div className="group">
