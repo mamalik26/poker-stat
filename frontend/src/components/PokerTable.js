@@ -116,7 +116,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
               variant="outline" 
               onClick={clearAll} 
               className="bg-white/10 hover:bg-white/20 border-emerald-300/30 text-white hover:text-white rounded-2xl px-6 py-3 font-medium transition-all duration-300 backdrop-blur-sm"
-              disabled={isLoading}
+              disabled={false}
             >
               <RotateCcw className="w-4 h-4 mr-2" />
               Clear All
