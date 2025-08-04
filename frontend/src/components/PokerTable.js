@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
-import { Trash2, RotateCcw, Loader2 } from 'lucide-react';
+import { Trash2, RotateCcw, Loader2, Users, Settings } from 'lucide-react';
 import CardSelector from './CardSelector';
 import { SUIT_SYMBOLS, SUIT_COLORS } from '../mock';
 
@@ -13,20 +13,24 @@ const PlayingCardDisplay = ({ card, onRemove, position, disabled }) => {
   return (
     <div className="relative group">
       <div className={`
-        w-16 h-20 bg-white border-2 border-gray-300 rounded-lg shadow-lg 
+        w-16 h-20 bg-gradient-to-br from-white via-gray-50 to-gray-100 
+        border-2 border-gray-300 rounded-xl shadow-lg 
         flex flex-col items-center justify-center font-bold text-sm
-        transition-all duration-200 hover:shadow-xl hover:-translate-y-1
+        transition-all duration-300 ease-in-out
+        hover:shadow-2xl hover:-translate-y-2 hover:scale-105
         ${SUIT_COLORS[card.suit]}
-        ${disabled ? 'opacity-60' : ''}
+        ${disabled ? 'opacity-60' : 'cursor-pointer'}
+        backdrop-blur-sm
       `}>
-        <span className="text-lg">{card.rank}</span>
-        <span className="text-xl">{SUIT_SYMBOLS[card.suit]}</span>
+        <span className="text-lg font-black drop-shadow-sm">{card.rank}</span>
+        <span className="text-xl drop-shadow-sm">{SUIT_SYMBOLS[card.suit]}</span>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent rounded-xl"></div>
       </div>
       {!disabled && (
         <Button
           variant="destructive"
           size="sm"
-          className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="absolute -top-2 -right-2 w-6 h-6 rounded-full p-0 opacity-0 group-hover:opacity-100 transition-all duration-200 shadow-lg hover:scale-110"
           onClick={() => onRemove(position)}
         >
           <Trash2 className="w-3 h-3" />
@@ -85,52 +89,63 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
   };
 
   return (
-    <Card className="w-full bg-gradient-to-br from-green-800 to-green-900 border-green-700 relative">
+    <div className="w-full relative">
       {isLoading && (
-        <div className="absolute inset-0 bg-black bg-opacity-30 rounded-lg flex items-center justify-center z-10">
-          <div className="bg-white rounded-lg p-4 flex items-center gap-3 shadow-xl">
-            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
-            <span className="font-medium text-gray-800">Analyzing hand...</span>
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-3xl flex items-center justify-center z-20">
+          <div className="bg-gradient-to-r from-[#0F3D2E] to-[#1B5E47] rounded-2xl p-6 flex items-center gap-4 shadow-2xl border border-emerald-400/20">
+            <Loader2 className="w-8 h-8 animate-spin text-emerald-300" />
+            <div className="text-white">
+              <div className="font-semibold text-lg">Analyzing Hand</div>
+              <div className="text-emerald-200 text-sm opacity-90">Running Monte Carlo simulation...</div>
+            </div>
           </div>
         </div>
       )}
       
-      <CardHeader className="pb-4">
-        <CardTitle className="text-white text-center text-2xl font-bold">
-          Texas Hold'em Probability Calculator
-        </CardTitle>
-        <div className="flex justify-center gap-4 mt-4">
-          <div className="flex items-center gap-2">
-            <Label className="text-white">Players:</Label>
-            <Input
-              type="number"
-              min="2"
-              max="10"
-              value={playerCount}
-              onChange={(e) => handlePlayerCountChange(parseInt(e.target.value))}
-              className="w-16 bg-white"
+      {/* Header Section */}
+      <div className="bg-gradient-to-r from-[#0F3D2E] to-[#1B5E47] px-8 py-6 rounded-t-3xl">
+        <div className="text-center">
+          <h2 className="text-white text-2xl md:text-3xl font-bold mb-4 tracking-tight">
+            🎲 Virtual Poker Table
+          </h2>
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <div className="flex items-center gap-3 bg-black/20 backdrop-blur-sm rounded-2xl px-6 py-3 border border-emerald-400/30">
+              <Users className="w-5 h-5 text-emerald-300" />
+              <Label className="text-emerald-200 font-medium">Players:</Label>
+              <Input
+                type="number"
+                min="2"
+                max="10"
+                value={playerCount}
+                onChange={(e) => handlePlayerCountChange(parseInt(e.target.value))}
+                className="w-16 bg-white/90 border-2 border-emerald-300/20 rounded-xl font-semibold text-center text-gray-800 focus:border-emerald-400 focus:ring-emerald-400/20"
+                disabled={isLoading}
+              />
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={clearAll} 
+              className="bg-white/10 hover:bg-white/20 border-emerald-300/30 text-white hover:text-white rounded-2xl px-6 py-3 font-medium transition-all duration-300 backdrop-blur-sm"
               disabled={isLoading}
-            />
+            >
+              <RotateCcw className="w-4 h-4 mr-2" />
+              Clear All
+            </Button>
           </div>
-          <Button 
-            variant="outline" 
-            onClick={clearAll} 
-            className="bg-white"
-            disabled={isLoading}
-          >
-            <RotateCcw className="w-4 h-4 mr-2" />
-            Clear All
-          </Button>
         </div>
-      </CardHeader>
+      </div>
       
-      <CardContent className="space-y-8">
+      {/* Felt Table Surface */}
+      <div className="bg-gradient-to-br from-[#0F3D2E] via-[#1B5E47] to-[#0F3D2E] px-8 py-10 space-y-10 rounded-b-3xl">
         {/* Your Hole Cards */}
         <div className="text-center">
-          <h3 className="text-white text-lg font-semibold mb-4">Your Hole Cards</h3>
-          <div className="flex justify-center gap-4">
+          <div className="mb-6">
+            <h3 className="text-white text-xl font-semibold mb-2 tracking-wide">Your Hole Cards</h3>
+            <div className="w-24 h-1 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-full mx-auto opacity-70"></div>
+          </div>
+          <div className="flex justify-center gap-6">
             {holeCards.map((card, index) => (
-              <div key={`hole-${index}`}>
+              <div key={`hole-${index}`} className="relative">
                 {card ? (
                   <PlayingCardDisplay 
                     card={card} 
@@ -139,28 +154,44 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
                     disabled={isLoading}
                   />
                 ) : (
-                  <CardSelector
-                    selectedCards={allSelectedCards}
-                    onCardSelect={(card) => handleHoleCardSelect(card, index)}
-                    title={`Select Hole Card ${index + 1}`}
-                    disabled={isLoading}
-                  />
+                  <div className="group">
+                    <CardSelector
+                      selectedCards={allSelectedCards}
+                      onCardSelect={(card) => handleHoleCardSelect(card, index)}
+                      title={`Select Hole Card ${index + 1}`}
+                      disabled={isLoading}
+                    />
+                  </div>
                 )}
+                <div className="mt-3 text-center">
+                  <span className="text-emerald-200 text-sm font-medium opacity-75">
+                    Card {index + 1}
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </div>
 
         {/* Community Cards */}
-        <div className="text-center">
-          <h3 className="text-white text-lg font-semibold mb-4">Community Cards</h3>
+        <div className="text-center space-y-8">
+          <div>
+            <h3 className="text-white text-xl font-semibold mb-2 tracking-wide">Community Cards</h3>
+            <div className="w-32 h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mx-auto opacity-70"></div>
+          </div>
           
           {/* Flop */}
-          <div className="mb-6">
-            <h4 className="text-white text-sm mb-3 opacity-80">Flop</h4>
-            <div className="flex justify-center gap-2">
+          <div className="space-y-4">
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-8 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent"></div>
+              <h4 className="text-emerald-200 text-lg font-semibold px-4 py-1 bg-black/20 rounded-xl backdrop-blur-sm border border-emerald-400/30">
+                Flop
+              </h4>
+              <div className="w-8 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent"></div>
+            </div>
+            <div className="flex justify-center gap-3">
               {communityCards.slice(0, 3).map((card, index) => (
-                <div key={`flop-${index}`}>
+                <div key={`flop-${index}`} className="relative">
                   {card ? (
                     <PlayingCardDisplay 
                       card={card} 
@@ -182,8 +213,14 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
           </div>
 
           {/* Turn */}
-          <div className="mb-6">
-            <h4 className="text-white text-sm mb-3 opacity-80">Turn</h4>
+          <div className="space-y-4">
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-8 h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+              <h4 className="text-blue-200 text-lg font-semibold px-4 py-1 bg-black/20 rounded-xl backdrop-blur-sm border border-blue-400/30">
+                Turn
+              </h4>
+              <div className="w-8 h-px bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+            </div>
             <div className="flex justify-center">
               {communityCards[3] ? (
                 <PlayingCardDisplay 
@@ -204,8 +241,14 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
           </div>
 
           {/* River */}
-          <div>
-            <h4 className="text-white text-sm mb-3 opacity-80">River</h4>
+          <div className="space-y-4">
+            <div className="flex items-center justify-center gap-2">
+              <div className="w-8 h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
+              <h4 className="text-purple-200 text-lg font-semibold px-4 py-1 bg-black/20 rounded-xl backdrop-blur-sm border border-purple-400/30">
+                River
+              </h4>
+              <div className="w-8 h-px bg-gradient-to-r from-transparent via-purple-400 to-transparent"></div>
+            </div>
             <div className="flex justify-center">
               {communityCards[4] ? (
                 <PlayingCardDisplay 
@@ -225,8 +268,8 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
             </div>
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 };
 
