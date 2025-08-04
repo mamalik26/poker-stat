@@ -81,12 +81,12 @@ function App() {
 
   const handlePlayersChange = useCallback((count) => {
     setPlayerCount(count);
-    // Re-analyze with new player count if we have cards
-    if (analysis) {
-      // This will trigger a re-analysis with the new player count
-      // The cards will remain the same, but the analysis will update
-    }
-  }, [analysis]);
+    // Clear analysis when player count changes
+    setAnalysis(null);
+  }, []);
+
+  // Check if we have valid cards to enable Calculate button
+  const canCalculate = currentCards.holeCards.filter(Boolean).length === 2;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1E1E1E] via-[#2D2D2D] to-[#1A1A1A] font-['Inter',sans-serif] text-gray-100">
