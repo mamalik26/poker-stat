@@ -109,7 +109,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
                 value={playerCount}
                 onChange={(e) => handlePlayerCountChange(parseInt(e.target.value))}
                 className="w-16 bg-white/90 border-2 border-emerald-300/20 rounded-xl font-semibold text-center text-gray-800 focus:border-emerald-400 focus:ring-emerald-400/20"
-                disabled={isLoading}
+                disabled={false}
               />
             </div>
             <Button 
