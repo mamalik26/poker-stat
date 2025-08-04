@@ -36,10 +36,15 @@ def get_db() -> AsyncIOMotorDatabase:
     return db
 
 @api_router.post("/analyze-hand", response_model=AnalysisResponse)
-async def analyze_hand(request: AnalysisRequest):
+async def analyze_hand(
+    request: AnalysisRequest,
+    current_user: User = Depends(get_current_subscribed_user),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
     """
     Analyze a poker hand and return win probabilities, hand strength, and strategic recommendations.
     
+    Requires active subscription to access.
     Uses Monte Carlo simulations for early streets (preflop, flop) and combinatorial analysis 
     for later streets (turn, river) when possible.
     """
