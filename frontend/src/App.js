@@ -10,19 +10,28 @@ function App() {
   const [analysis, setAnalysis] = useState(null);
   const [playerCount, setPlayerCount] = useState(2);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentCards, setCurrentCards] = useState({ holeCards: [null, null], communityCards: [null, null, null, null, null] });
   const { toast } = useToast();
 
-  const handleCardsChange = useCallback(async (holeCards, communityCards) => {
-    // Reset analysis if no hole cards
-    const validHoleCards = holeCards.filter(Boolean);
-    if (validHoleCards.length === 0) {
-      setAnalysis(null);
-      return;
-    }
+  const handleCardsChange = useCallback((holeCards, communityCards) => {
+    // Update card state without triggering calculation
+    setCurrentCards({ holeCards, communityCards });
+    
+    // Reset analysis when cards change
+    setAnalysis(null);
+  }, []);
 
-    // Need at least 2 hole cards to analyze
+  const handleCalculate = useCallback(async () => {
+    const { holeCards, communityCards } = currentCards;
+    
+    // Validate we have hole cards
+    const validHoleCards = holeCards.filter(Boolean);
     if (validHoleCards.length < 2) {
-      setAnalysis(null);
+      toast({
+        title: "Incomplete Hand",
+        description: "Please select both hole cards before calculating",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -68,7 +77,7 @@ function App() {
     } finally {
       setIsLoading(false);
     }
-  }, [playerCount, toast]);
+  }, [currentCards, playerCount, toast]);
 
   const handlePlayersChange = useCallback((count) => {
     setPlayerCount(count);
