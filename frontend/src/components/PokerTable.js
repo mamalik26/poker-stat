@@ -57,9 +57,11 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
   };
 
   const handleCommunityCardSelect = (card, position) => {
+    console.log('Community card selected:', card, 'at position:', position);
     const newCommunityCards = [...communityCards];
     newCommunityCards[position] = card;
     setCommunityCards(newCommunityCards);
+    console.log('Calling onCardsChange with:', holeCards, newCommunityCards);
     onCardsChange(holeCards, newCommunityCards);
   };
 
