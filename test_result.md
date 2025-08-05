@@ -697,6 +697,18 @@ frontend:
         - agent: "testing"
         - comment: "✅ PASS - Complete workflow tested successfully! AUTHENTICATION: Moderator login with moderateur@pokerpro.com/PokerMod2024! works, redirects to dashboard, shows 'Poker Pro Modérateur' with 'Abonnement actif'. CALCULATOR ACCESS: 'Ouvrir le calculateur' button works, redirects to /calculator, poker table loads with 'Virtual Poker Table', probability dashboard shows 'Ready for Analysis', 'Calculate Probabilities' button visible. INTERFACE: Card selector modal opens with organized suit sections, player count selector works (2-6 players tested), Clear All button functions properly. Minor: Card selection has modal overlay click interference but interface displays correctly. Overall workflow is fully functional for authenticated moderator users."
 
+  - task: "Calculator Card Selection Bug - Calculate button remains disabled after selecting 2 hole cards"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/App.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+        - agent: "testing"
+        - comment: "❌ CRITICAL BUG CONFIRMED: The Calculate Probabilities button remains DISABLED (gray) even after selecting 2 hole cards, preventing users from running probability calculations. Console logs consistently show 'Can calculate: false' indicating the canCalculate logic (App.js line 113) is not working properly. The issue is in React state management between PokerTable and App components - the onCardsChange callback is not properly updating currentCards state, causing the button to stay disabled instead of becoming enabled (green). This breaks the core functionality of the poker calculator as users cannot access probability analysis after card selection. Root cause: handleHoleCardSelect in PokerTable calls onCardsChange, but currentCards state in App component is not updating correctly."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
