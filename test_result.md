@@ -783,7 +783,7 @@ test_plan:
     - "Session Management and Authentication Persistence Issues"
   test_all: false
   test_priority: "high_first"
-  frontend_testing_completed: false
+  frontend_testing_completed: true
   saas_auth_testing_completed: true
   payment_system_fix_testing_completed: true
   moderator_access_testing_completed: true
@@ -792,6 +792,7 @@ test_plan:
   comprehensive_moderator_testing_completed: true
   backend_moderator_verification_completed: true
   card_selection_bug_fixed: true
+  home_page_testing_completed: true
 
 agent_communication:
     - agent: "testing"
