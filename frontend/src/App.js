@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { Toaster } from './components/ui/toaster';
 
 // Pages
+import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
