@@ -87,6 +87,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
     const emptyCommunity = [null, null, null, null, null];
     setHoleCards(emptyHole);
     setCommunityCards(emptyCommunity);
+    console.log('Calling onCardsChange after clear all:', emptyHole, emptyCommunity);
     onCardsChange(emptyHole, emptyCommunity);
   };
 
