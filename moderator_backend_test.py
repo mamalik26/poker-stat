@@ -234,7 +234,7 @@ class ModeratorBackendTester:
                         {"rank": "A", "suit": "spades"},
                         {"rank": "K", "suit": "hearts"}
                     ],
-                    "community_cards": [None, None, None, None, None],
+                    "community_cards": [],
                     "player_count": 2,
                     "simulation_iterations": 5000
                 }
