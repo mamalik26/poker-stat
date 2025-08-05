@@ -166,10 +166,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
                     <div className="group">
                       <CardSelector
                         selectedCards={allSelectedCards}
-                        onCardSelect={(selectedCard) => {
-                          console.log('CardSelector callback called for index:', index);
-                          handleHoleCardSelect(selectedCard, index);
-                        }}
+                        onCardSelect={createHoleCardSelector(index)}
                         title={`Select Hole Card ${index + 1}`}
                         disabled={false}
                         cardPosition={index}
