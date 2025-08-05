@@ -48,9 +48,11 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
   const allSelectedCards = [...holeCards.filter(Boolean), ...communityCards.filter(Boolean)];
 
   const handleHoleCardSelect = (card, position) => {
+    console.log('Hole card selected:', card, 'at position:', position);
     const newHoleCards = [...holeCards];
     newHoleCards[position] = card;
     setHoleCards(newHoleCards);
+    console.log('Calling onCardsChange with:', newHoleCards, communityCards);
     onCardsChange(newHoleCards, communityCards);
   };
 
