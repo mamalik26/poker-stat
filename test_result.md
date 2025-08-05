@@ -764,7 +764,6 @@ test_plan:
   current_focus:
     - "Calculator Card Selection Bug - Calculate button remains disabled after selecting 2 hole cards"
     - "Session Management and Authentication Persistence Issues"
-    - "Comprehensive Moderator Account Login and Access Permissions Testing"
   stuck_tasks:
     - "POST /api/analyze-hand - High iteration performance testing"
     - "Calculator Card Selection Bug - Calculate button remains disabled after selecting 2 hole cards"
@@ -778,6 +777,7 @@ test_plan:
   complete_workflow_testing_completed: true
   critical_bug_found: true
   comprehensive_moderator_testing_completed: true
+  backend_moderator_verification_completed: true
 
 agent_communication:
     - agent: "testing"
