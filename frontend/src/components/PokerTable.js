@@ -200,7 +200,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
                   ) : (
                     <CardSelector
                       selectedCards={allSelectedCards}
-                      onCardSelect={(card) => handleCommunityCardSelect(card, index)}
+                      onCardSelect={(selectedCard) => handleCommunityCardSelect(selectedCard, index)}
                       title={`Select Flop Card ${index + 1}`}
                       disabled={index > 0 && !communityCards[index - 1]}
                     />
