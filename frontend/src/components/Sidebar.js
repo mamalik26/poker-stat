@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { Separator } from './ui/separator';
 import { Badge } from './ui/badge';
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import { Drawer, DrawerContent, DrawerTrigger } from './ui/drawer';
 import {
   Home,
   User,
