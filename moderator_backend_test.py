@@ -373,9 +373,9 @@ class ModeratorBackendTester:
                     
                     # This should fail now
                     protected_response = self.session.get(f"{self.base_url}/auth/me")
-                    if protected_response.status_code == 403:
+                    if protected_response.status_code in [401, 403]:  # Accept both unauthorized codes
                         self.log_test("POST /api/auth/logout - Logout functionality", True, 
-                                    "Logout successful, protected routes now return 403")
+                                    f"Logout successful, protected routes now return {protected_response.status_code}")
                         return True
                     else:
                         self.log_test("POST /api/auth/logout - Logout functionality", False, 
