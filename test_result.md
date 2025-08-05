@@ -701,13 +701,16 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
     needs_retesting: false
     status_history:
         - working: false
         - agent: "testing"
         - comment: "❌ CRITICAL BUG CONFIRMED: The Calculate Probabilities button remains DISABLED (gray) even after selecting 2 hole cards, preventing users from running probability calculations. Console logs consistently show 'Can calculate: false' indicating the canCalculate logic (App.js line 113) is not working properly. The issue is in React state management between PokerTable and App components - the onCardsChange callback is not properly updating currentCards state, causing the button to stay disabled instead of becoming enabled (green). This breaks the core functionality of the poker calculator as users cannot access probability analysis after card selection. Root cause: handleHoleCardSelect in PokerTable calls onCardsChange, but currentCards state in App component is not updating correctly."
+        - working: false
+        - agent: "testing"
+        - comment: "❌ BUG STILL EXISTS AFTER useCallback REMOVAL: Despite removing useCallback dependencies from handleCardsChange, handlePlayersChange, and handleCalculate functions, the critical bug persists. DETAILED ROOT CAUSE ANALYSIS: The issue is in the card position logic in PokerTable.js. When selecting the second hole card, the console shows 'Hole card selected: {rank: K, suit: spades, id: K_spades} at position: 0' - the second card is being placed at position 0 instead of position 1, overwriting the first card. This results in 'Calling onCardsChange with: [Object, null]' showing only 1 card instead of 2. The canCalculate logic correctly evaluates to false because currentCards.holeCards.filter(Boolean).length equals 1, not 2. VISUAL CONFIRMATION: Screenshot shows King of Spades in first card slot, but second slot still shows 'Add' button, confirming the second card selection overwrote the first card. The bug is NOT in the useCallback dependencies but in the CardSelector component's position parameter passing to handleHoleCardSelect function."
 
   - task: "Comprehensive Moderator Account Login and Access Permissions Testing"
     implemented: true
