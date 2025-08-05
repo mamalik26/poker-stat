@@ -66,15 +66,18 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
   };
 
   const removeCard = (type, position) => {
+    console.log('Removing card:', type, 'at position:', position);
     if (type === 'hole') {
       const newHoleCards = [...holeCards];
       newHoleCards[position] = null;
       setHoleCards(newHoleCards);
+      console.log('Calling onCardsChange after hole card removal:', newHoleCards, communityCards);
       onCardsChange(newHoleCards, communityCards);
     } else {
       const newCommunityCards = [...communityCards];
       newCommunityCards[position] = null;
       setCommunityCards(newCommunityCards);
+      console.log('Calling onCardsChange after community card removal:', holeCards, newCommunityCards);
       onCardsChange(holeCards, newCommunityCards);
     }
   };
