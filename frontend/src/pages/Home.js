@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 const Home = () => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   const handleGetStarted = () => {
