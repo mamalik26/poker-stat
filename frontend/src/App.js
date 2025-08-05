@@ -111,6 +111,7 @@ const Calculator = () => {
   }, []);
 
   const canCalculate = currentCards.holeCards.filter(Boolean).length === 2;
+  console.log('Can calculate:', canCalculate, 'Current cards:', currentCards);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1E1E1E] via-[#2D2D2D] to-[#1A1A1A] font-['Inter',sans-serif] text-gray-100">
