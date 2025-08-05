@@ -246,8 +246,9 @@ class ModeratorBackendTester:
                                 f"Moderator can access calculator. Role: {role}, Subscription: {subscription_status}")
                     return True
                 else:
+                    error_text = analyze_response.text if hasattr(analyze_response, 'text') else 'No error text'
                     self.log_test("Subscription Bypass Verification", False, 
-                                f"Calculator access denied. Status: {analyze_response.status_code}, Role: {role}, Subscription: {subscription_status}")
+                                f"Calculator access denied. Status: {analyze_response.status_code}, Role: {role}, Subscription: {subscription_status}, Error: {error_text}")
                     return False
             else:
                 self.log_test("Subscription Bypass Verification", False, 
