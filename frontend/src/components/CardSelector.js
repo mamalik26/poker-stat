@@ -34,12 +34,13 @@ const PlayingCard = ({ card, isSelected, onSelect, disabled }) => {
   );
 };
 
-const CardSelector = ({ selectedCards, onCardSelect, title, disabled = false }) => {
+const CardSelector = ({ selectedCards, onCardSelect, title, disabled = false, cardPosition }) => {
+  console.log('CardSelector rendered with position:', cardPosition);
   const [isOpen, setIsOpen] = useState(false);
   const deck = generateDeck();
   
   const handleCardSelect = (card) => {
-    console.log('CardSelector handleCardSelect called with card:', card);
+    console.log('CardSelector handleCardSelect called with card:', card, 'for position:', cardPosition);
     console.log('CardSelector onCardSelect function:', onCardSelect);
     onCardSelect(card);
     setIsOpen(false);
