@@ -236,7 +236,7 @@ class ModeratorBackendTester:
                     ],
                     "community_cards": [],
                     "player_count": 2,
-                    "simulation_iterations": 5000
+                    "simulation_iterations": 10000  # Fixed: must be >= 10000
                 }
                 
                 analyze_response = self.session.post(f"{self.base_url}/analyze-hand", json=payload)
