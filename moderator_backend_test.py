@@ -271,7 +271,7 @@ class ModeratorBackendTester:
                         {"rank": "Z", "suit": "spades"},  # Invalid rank
                         {"rank": "K", "suit": "hearts"}
                     ],
-                    "community_cards": [None, None, None, None, None],
+                    "community_cards": [],
                     "player_count": 2,
                     "simulation_iterations": 1000
                 },
@@ -284,7 +284,7 @@ class ModeratorBackendTester:
                         {"rank": "A", "suit": "spades"},
                         {"rank": "A", "suit": "spades"}  # Duplicate
                     ],
-                    "community_cards": [None, None, None, None, None],
+                    "community_cards": [],
                     "player_count": 2,
                     "simulation_iterations": 1000
                 },
