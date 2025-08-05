@@ -717,18 +717,21 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Calculator Card Selection Bug - Calculate button remains disabled after selecting 2 hole cards"
     - "Complete Poker Calculator Workflow Testing Completed"
     - "Authentication and Calculator Integration Verified"
     - "CORS Issue Resolution Confirmed"
   stuck_tasks:
     - "POST /api/analyze-hand - High iteration performance testing"
+    - "Calculator Card Selection Bug - Calculate button remains disabled after selecting 2 hole cards"
   test_all: false
   test_priority: "high_first"
-  frontend_testing_completed: true
+  frontend_testing_completed: false
   saas_auth_testing_completed: true
   payment_system_fix_testing_completed: true
   moderator_access_testing_completed: true
   complete_workflow_testing_completed: true
+  critical_bug_found: true
 
 agent_communication:
     - agent: "testing"
