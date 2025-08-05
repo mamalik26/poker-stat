@@ -221,7 +221,7 @@ function App() {
             <Route path="/test-calculator" element={<TestCalculator />} />
 
             {/* Default redirect */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<Home />} />
           </Routes>
           <Toaster />
         </div>
