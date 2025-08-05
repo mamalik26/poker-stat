@@ -147,11 +147,11 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
             {holeCards.map((card, index) => {
               console.log('Rendering hole card at index:', index, 'card:', card);
               return (
-                <div key={`hole-${index}`} className="relative">
+                <div key={`hole-${index}`} className="relative" data-card-index={index}>
                   {card ? (
                     <PlayingCardDisplay 
                       card={card} 
-                      onRemove={(pos) => removeCard('hole', pos)}
+                      onRemove={() => removeCard('hole', index)}
                       position={index}
                       disabled={false}
                     />
@@ -165,6 +165,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
                         }}
                         title={`Select Hole Card ${index + 1}`}
                         disabled={false}
+                        cardPosition={index}
                       />
                     </div>
                   )}
