@@ -201,8 +201,8 @@ const Sidebar = () => {
 
       {/* Mobile Menu Button */}
       <div className="lg:hidden">
-        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetTrigger asChild>
+        <Drawer open={mobileOpen} onOpenChange={setMobileOpen}>
+          <DrawerTrigger asChild>
             <Button
               variant="ghost"
               className="fixed top-4 left-4 z-50 p-2 bg-muted/80 hover:bg-muted"
@@ -210,11 +210,11 @@ const Sidebar = () => {
               <Menu className="h-6 w-6" />
               <span className="sr-only">Ouvrir le menu</span>
             </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-64">
+          </DrawerTrigger>
+          <DrawerContent className="h-full">
             <SidebarContent />
-          </SheetContent>
-        </Sheet>
+          </DrawerContent>
+        </Drawer>
       </div>
     </>
   );
