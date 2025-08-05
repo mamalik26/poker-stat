@@ -777,7 +777,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Session Management and Authentication Persistence Issues"
+    - "Navigation Improvements Testing - Sidebar and Back Button"
   stuck_tasks:
     - "POST /api/analyze-hand - High iteration performance testing"
     - "Session Management and Authentication Persistence Issues"
@@ -793,6 +793,7 @@ test_plan:
   backend_moderator_verification_completed: true
   card_selection_bug_fixed: true
   home_page_testing_completed: true
+  navigation_improvements_testing_completed: true
 
 agent_communication:
     - agent: "testing"
