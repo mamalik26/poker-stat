@@ -144,32 +144,38 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
             <div className="w-24 h-1 bg-gradient-to-r from-emerald-400 to-blue-400 rounded-full mx-auto opacity-70"></div>
           </div>
           <div className="flex justify-center gap-6">
-            {holeCards.map((card, index) => (
-              <div key={`hole-${index}`} className="relative">
-                {card ? (
-                  <PlayingCardDisplay 
-                    card={card} 
-                    onRemove={(pos) => removeCard('hole', pos)}
-                    position={index}
-                    disabled={false}
-                  />
-                ) : (
-                  <div className="group">
-                    <CardSelector
-                      selectedCards={allSelectedCards}
-                      onCardSelect={(selectedCard) => handleHoleCardSelect(selectedCard, index)}
-                      title={`Select Hole Card ${index + 1}`}
+            {holeCards.map((card, index) => {
+              console.log('Rendering hole card at index:', index, 'card:', card);
+              return (
+                <div key={`hole-${index}`} className="relative">
+                  {card ? (
+                    <PlayingCardDisplay 
+                      card={card} 
+                      onRemove={(pos) => removeCard('hole', pos)}
+                      position={index}
                       disabled={false}
                     />
+                  ) : (
+                    <div className="group">
+                      <CardSelector
+                        selectedCards={allSelectedCards}
+                        onCardSelect={(selectedCard) => {
+                          console.log('CardSelector callback called for index:', index);
+                          handleHoleCardSelect(selectedCard, index);
+                        }}
+                        title={`Select Hole Card ${index + 1}`}
+                        disabled={false}
+                      />
+                    </div>
+                  )}
+                  <div className="mt-3 text-center">
+                    <span className="text-emerald-200 text-sm font-medium opacity-75">
+                      Card {index + 1}
+                    </span>
                   </div>
-                )}
-                <div className="mt-3 text-center">
-                  <span className="text-emerald-200 text-sm font-medium opacity-75">
-                    Card {index + 1}
-                  </span>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 
