@@ -195,39 +195,51 @@ function App() {
     <AuthProvider>
       <BrowserRouter>
         <div className="App">
-          <Routes>
-            {/* Public routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/pricing" element={<Pricing />} />
+          <AppLayout>
+            <Routes>
+              {/* Public routes */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/pricing" element={<Pricing />} />
 
-            {/* Protected routes */}
-            <Route path="/dashboard" element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            } />
-            
-            <Route path="/thank-you" element={
-              <ProtectedRoute>
-                <ThankYou />
-              </ProtectedRoute>
-            } />
+              {/* Protected routes */}
+              <Route path="/dashboard" element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } />
 
-            <Route path="/calculator" element={
-              <ProtectedRoute requireSubscription={true}>
-                <Calculator />
-              </ProtectedRoute>
-            } />
+              <Route path="/account" element={
+                <ProtectedRoute>
+                  <Account />
+                </ProtectedRoute>
+              } />
 
-            {/* Test route for card selector */}
-            <Route path="/test-calculator" element={<TestCalculator />} />
+              <Route path="/settings" element={
+                <ProtectedRoute>
+                  <Settings />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/thank-you" element={
+                <ProtectedRoute>
+                  <ThankYou />
+                </ProtectedRoute>
+              } />
 
-            {/* Default redirect */}
-            <Route path="/" element={<Home />} />
-          </Routes>
+              <Route path="/calculator" element={
+                <ProtectedRoute requireSubscription={true}>
+                  <Calculator />
+                </ProtectedRoute>
+              } />
+
+              {/* Test route for card selector */}
+              <Route path="/test-calculator" element={<TestCalculator />} />
+            </Routes>
+          </AppLayout>
           <Toaster />
         </div>
       </BrowserRouter>
