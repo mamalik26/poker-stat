@@ -39,6 +39,8 @@ const CardSelector = ({ selectedCards, onCardSelect, title, disabled = false }) 
   const deck = generateDeck();
   
   const handleCardSelect = (card) => {
+    console.log('CardSelector handleCardSelect called with card:', card);
+    console.log('CardSelector onCardSelect function:', onCardSelect);
     onCardSelect(card);
     setIsOpen(false);
   };
