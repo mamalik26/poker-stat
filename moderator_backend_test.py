@@ -299,7 +299,8 @@ class ModeratorBackendTester:
         for test_case in test_cases:
             try:
                 response = self.session.post(f"{self.base_url}/analyze-hand", json=test_case["payload"])
-                if response.status_code == test_case["expected_status"]:
+                expected_statuses = test_case["expected_status"] if isinstance(test_case["expected_status"], list) else [test_case["expected_status"]]
+                if response.status_code in expected_statuses:
                     passed_tests.append(test_case["name"])
                 else:
                     failed_tests.append(f"{test_case['name']} (got {response.status_code})")
