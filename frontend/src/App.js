@@ -40,7 +40,7 @@ const Calculator = () => {
     setAnalysis(null);
   };
 
-  const handleCalculate = useCallback(async () => {
+  const handleCalculate = async () => {
     const { holeCards, communityCards } = currentCards;
     
     const validHoleCards = holeCards.filter(Boolean);
@@ -103,7 +103,7 @@ const Calculator = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentCards, playerCount, toast]);
+  };
 
   const handlePlayersChange = (count) => {
     setPlayerCount(count);
