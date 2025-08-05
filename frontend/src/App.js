@@ -35,6 +35,7 @@ const Calculator = () => {
   const { toast } = useToast();
 
   const handleCardsChange = useCallback((holeCards, communityCards) => {
+    console.log('Cards changed:', { holeCards, communityCards });
     setCurrentCards({ holeCards, communityCards });
     setAnalysis(null);
   }, []);
