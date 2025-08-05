@@ -230,7 +230,7 @@ const PokerTable = ({ onCardsChange, onPlayersChange, isLoading }) => {
               ) : (
                 <CardSelector
                   selectedCards={allSelectedCards}
-                  onCardSelect={(card) => handleCommunityCardSelect(card, 3)}
+                  onCardSelect={(selectedCard) => handleCommunityCardSelect(selectedCard, 3)}
                   title="Select Turn Card"
                   disabled={!communityCards[2]}
                 />
