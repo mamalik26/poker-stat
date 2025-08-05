@@ -34,11 +34,11 @@ const Calculator = () => {
   const [currentCards, setCurrentCards] = useState({ holeCards: [null, null], communityCards: [null, null, null, null, null] });
   const { toast } = useToast();
 
-  const handleCardsChange = useCallback((holeCards, communityCards) => {
+  const handleCardsChange = (holeCards, communityCards) => {
     console.log('Cards changed:', { holeCards, communityCards });
     setCurrentCards({ holeCards, communityCards });
     setAnalysis(null);
-  }, []);
+  };
 
   const handleCalculate = useCallback(async () => {
     const { holeCards, communityCards } = currentCards;
