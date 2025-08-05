@@ -709,6 +709,30 @@ frontend:
         - agent: "testing"
         - comment: "❌ CRITICAL BUG CONFIRMED: The Calculate Probabilities button remains DISABLED (gray) even after selecting 2 hole cards, preventing users from running probability calculations. Console logs consistently show 'Can calculate: false' indicating the canCalculate logic (App.js line 113) is not working properly. The issue is in React state management between PokerTable and App components - the onCardsChange callback is not properly updating currentCards state, causing the button to stay disabled instead of becoming enabled (green). This breaks the core functionality of the poker calculator as users cannot access probability analysis after card selection. Root cause: handleHoleCardSelect in PokerTable calls onCardsChange, but currentCards state in App component is not updating correctly."
 
+  - task: "Comprehensive Moderator Account Login and Access Permissions Testing"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ COMPREHENSIVE MODERATOR TESTING COMPLETED! PHASE 1 - BASIC AUTHENTICATION: Moderator login successful with credentials moderateur@pokerpro.com/PokerMod2024!, proper redirect to dashboard, user display shows 'Poker Pro Modérateur', subscription status correctly shows 'Abonnement actif' (automatically granted for moderator role). PHASE 2 - DASHBOARD ACCESS & PERMISSIONS: 'Ouvrir le calculateur' button visible and accessible (not disabled), no subscription upgrade prompts or restrictions appear for moderator account. PHASE 3 - CALCULATOR ACCESS: Immediate redirect to /calculator without subscription check, calculator interface loads completely with poker table and probability dashboard, card selector modal opens successfully with organized suit sections (Spades, Hearts, Diamonds, Clubs), no subscription warnings or paywalls in calculator. PHASE 4 - API ACCESS: Authenticated API calls working with moderator credentials. MODERATOR PRIVILEGES CONFIRMED: Full calculator access without subscription, no paywall restrictions, all premium features accessible, backend API calls work with moderator role bypass. Minor issues found: Session persistence fails across page refreshes (redirects to login), logout button not found on dashboard. The critical card selection bug still exists where Calculate button remains disabled after card selection, but this is a separate known issue. Overall moderator authentication and access control working correctly."
+
+  - task: "Session Management and Authentication Persistence Issues"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/contexts/AuthContext.js"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+        - agent: "testing"
+        - comment: "❌ CRITICAL SESSION ISSUE: Authentication session does not persist across page refreshes. Users are redirected to login page even when authentication cookies (access_token) are present. This affects user experience as users lose their session when refreshing the page or navigating directly to protected routes. The issue appears to be in the AuthContext checkAuthStatus() method or cookie handling. Additionally, logout button is not found on the dashboard, preventing proper logout functionality."
+
 metadata:
   created_by: "testing_agent"
   version: "1.0"
@@ -718,12 +742,12 @@ metadata:
 test_plan:
   current_focus:
     - "Calculator Card Selection Bug - Calculate button remains disabled after selecting 2 hole cards"
-    - "Complete Poker Calculator Workflow Testing Completed"
-    - "Authentication and Calculator Integration Verified"
-    - "CORS Issue Resolution Confirmed"
+    - "Session Management and Authentication Persistence Issues"
+    - "Comprehensive Moderator Account Login and Access Permissions Testing"
   stuck_tasks:
     - "POST /api/analyze-hand - High iteration performance testing"
     - "Calculator Card Selection Bug - Calculate button remains disabled after selecting 2 hole cards"
+    - "Session Management and Authentication Persistence Issues"
   test_all: false
   test_priority: "high_first"
   frontend_testing_completed: false
@@ -732,6 +756,7 @@ test_plan:
   moderator_access_testing_completed: true
   complete_workflow_testing_completed: true
   critical_bug_found: true
+  comprehensive_moderator_testing_completed: true
 
 agent_communication:
     - agent: "testing"
