@@ -105,10 +105,10 @@ const Calculator = () => {
     }
   }, [currentCards, playerCount, toast]);
 
-  const handlePlayersChange = useCallback((count) => {
+  const handlePlayersChange = (count) => {
     setPlayerCount(count);
     setAnalysis(null);
-  }, []);
+  };
 
   const canCalculate = currentCards.holeCards.filter(Boolean).length === 2;
   console.log('Can calculate:', canCalculate, 'Current cards:', currentCards);
