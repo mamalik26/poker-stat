@@ -701,7 +701,7 @@ frontend:
     implemented: true
     working: false
     file: "/app/frontend/src/App.js"
-    stuck_count: 2
+    stuck_count: 3
     priority: "high"
     needs_retesting: false
     status_history:
@@ -711,6 +711,9 @@ frontend:
         - working: false
         - agent: "testing"
         - comment: "❌ BUG STILL EXISTS AFTER useCallback REMOVAL: Despite removing useCallback dependencies from handleCardsChange, handlePlayersChange, and handleCalculate functions, the critical bug persists. DETAILED ROOT CAUSE ANALYSIS: The issue is in the card position logic in PokerTable.js. When selecting the second hole card, the console shows 'Hole card selected: {rank: K, suit: spades, id: K_spades} at position: 0' - the second card is being placed at position 0 instead of position 1, overwriting the first card. This results in 'Calling onCardsChange with: [Object, null]' showing only 1 card instead of 2. The canCalculate logic correctly evaluates to false because currentCards.holeCards.filter(Boolean).length equals 1, not 2. VISUAL CONFIRMATION: Screenshot shows King of Spades in first card slot, but second slot still shows 'Add' button, confirming the second card selection overwrote the first card. The bug is NOT in the useCallback dependencies but in the CardSelector component's position parameter passing to handleHoleCardSelect function."
+        - working: false
+        - agent: "testing"
+        - comment: "❌ FINAL VERIFICATION CONFIRMS BUG STILL EXISTS: Comprehensive testing with moderator credentials (moderateur@pokerpro.com/PokerMod2024!) confirms the critical card selection bug persists. DETAILED FINDINGS: 1) Successfully logged in and navigated to calculator ✅ 2) Initial state correct - Calculate button disabled (gray) ✅ 3) CRITICAL ISSUE: When selecting second hole card (King of Hearts), console shows 'Hole card selected: {rank: K, suit: hearts, id: K_hearts} at position: 0' - the second card overwrites the first card at position 0 instead of being placed at position 1. 4) Console shows 'Calling onCardsChange with: [Object, null]' indicating only 1 card instead of 2. 5) 'Can calculate: false' persists because only 1 card is actually stored. 6) Calculate button remains disabled (gray) instead of becoming enabled (green). VISUAL EVIDENCE: Screenshot shows King of Hearts in first card slot, but second slot still shows 'Add' button, confirming the position parameter bug. ROOT CAUSE CONFIRMED: The CardSelector component is not properly passing the correct position index to handleHoleCardSelect function in PokerTable.js. This is a critical bug that prevents users from accessing the core poker calculator functionality."
 
   - task: "Comprehensive Moderator Account Login and Access Permissions Testing"
     implemented: true
