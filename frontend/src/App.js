@@ -18,6 +18,11 @@ import ResetPassword from './pages/ResetPassword';
 import Dashboard from './pages/Dashboard';
 import Pricing from './pages/Pricing';
 import ThankYou from './pages/ThankYou';
+import Account from './pages/Account';
+import Settings from './pages/Settings';
+
+// Layout
+import AppLayout from './components/AppLayout';
 
 // Original calculator components
 import PokerTable from './components/PokerTable';
